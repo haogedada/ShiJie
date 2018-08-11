@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="com.haoge.shijie.dao.UserDao">
+
+    <!--
+        动态代理的开发规范
+            1: 映射文件的namespace必须等于接口的全路径名称
+            2: 映射文件的sql唯一标示,必须等于接口的方法名称
+            3: 映射文件的parameterType必须等于接口方法的参数类型
+            4: 映射文件resultType必须等于接口方法的返回类型
+     -->
+<!--sql多个查询-->
+    <!--关联实体映射关系-->
+    <resultMap type="com.haoge.shijie.pojo.UserBean" id="userResultMap">
+        <!--代表本体类-->
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="userPassword" column="user_password"/>
+        <result property="userNickname" column="user_nickname"/>
+        <result property="userSex" column="user_sex"/>
+        <result property="userBirthday" column="user_birthday"/>
+        <result property="bardianSign" column="bardian_sign"/>
+        <result property="headimgUrl" column="headimg_url"/>
+        <result property="registerTime" column="register_time"/>
+        <result property="userEmail" column="user_email"/>
+        <result property="headimgUrl" column="headimg_url"/>
+        <!--association 表示一对一的关联关系，property指定实体对象名字-->
+       <association property="auxiliaryUserBean" javaType="com.haoge.shijie.pojo.AuxiliaryUserBean">
+         <id property="Id" column="id"/>
+         <result property="userId" column="user_id"/>
+           <result property="userRole" column="user_role"/>
+           <result property="userCode" column="user_code"/>
+           <result property="userPermission" column="user_permission"/>
+           <result property="userToken" column="user_token"/>
+           </association>
+        <!-- collection 表示集合，ofType指定集合中的对象类型 -->
+        <collection property="videoBeans" ofType="com.haoge.shijie.pojo.VideoBean">
+           <id property="videoId" column="video_id"/>
+           <result property="userId" column="user_id"/>
+            <result property="videoTitle" column="video_title"/>
+            <result property="playerCount" column="player_count"/>
+            <result property="videoTipNum" column="video_tip_num"/>
+            <result property="videoTrampleNum" column="video_trample_num"/>
+            <result property="videoUrl" column="video_url"/>
+            <result property="videoCreatTime" column="video_creat_time"/>
+         </collection>
+        <collection property="userFriends" ofType="com.haoge.shijie.pojo.UserFriendsBean">
+            <id property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="friendId" column="friend_id"/>
+            <result property="friendType" column="friend_type"/>
+            <result property="creatTime" column="creat_time"/>
+        </collection>
+        <collection property="collections" ofType="com.haoge.shijie.pojo.CollectionBean">
+            <id property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="videoId" column="video_id"/>
+            <result property="creatTime" column="creat_time"/>
+        </collection>
+
+     </resultMap>
+    <select id="queryUserList" resultType="com.haoge.shijie.pojo.UserBean">
+        SELECT
+          *
+        FROM
+          Tb_user
+    </select>
+    <select id="queryUserById" resultType="com.haoge.shijie.pojo.UserBean" >
+        SELECT
+        *
+        FROM
+        Tb_user u
+        WHERE u.user_id=#{userId}
+    </select>
+
+
+    <select id="queryUserAndAuxById" resultType="com.haoge.shijie.pojo.UserBean" resultMap="userResultMap">
+        SELECT
+        *
+        FROM
+        Tb_user u,Tb_auxiliary_user a
+        WHERE u.user_id=#{userId} AND a.user_id=#{userId}
+    </select>
+
+    <select id="queryUserAndVdoById" resultType="com.haoge.shijie.pojo.UserBean" resultMap="userResultMap">
+        SELECT
+        *
+        FROM
+        Tb_user u,Tb_video v
+        WHERE u.user_id=#{userId} AND v.user_id=#{userId}
+    </select>
+
+    <select id="queryUserAndFriendById" resultType="com.haoge.shijie.pojo.UserBean" resultMap="userResultMap">
+        SELECT
+        *
+        FROM
+        Tb_user u,Tb_userfriendes f
+        WHERE u.user_id=#{userId} AND f.user_id=#{userId} AND f.friend_type=#{friendType}
+    </select>
+
+    <select id="queryUserAndCollById" resultType="com.haoge.shijie.pojo.UserBean" resultMap="userResultMap">
+        SELECT
+        *
+        FROM
+        Tb_user u,Tb_commentator c
+        WHERE u.user_id=#{userId} AND c.user_id=#{userId}
+    </select>
+    <select id="queryUserByName" resultType="com.haoge.shijie.pojo.UserBean">
+        SELECT
+        *
+        FROM
+        Tb_user u
+        WHERE u.user_name=#{userName}
+    </select>
+    <select id="queryUserByEmail" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        Tb_user u
+        WHERE u.user_email=#{userEmail}
+    </select>
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="userId"
+            keyColumn="user_id" parameterType="com.haoge.shijie.pojo.UserBean" >
+        INSERT INTO
+        Tb_user(user_name,user_password,user_nickname,user_sex,user_birthday,bardian_sign,
+        headimg_url,register_time,user_email)
+        VALUES(#{userName},#{userPassword},#{userNickname},#{userSex},#{userBirthday},#{bardianSign},
+        #{headimgUrl},#{registerTime},#{userEmail})
+    </insert>
+    <update id="updateUser" parameterType="com.haoge.shijie.pojo.UserBean" >
+        UPDATE  Tb_user
+        <set>
+            <if test="userName!=null">user_name=#{userName},</if>
+            <if test="userPassword!=null">user_password=#{userPassword},</if>
+            user_nickname=#{userNickname},
+            user_sex=#{userSex},
+            user_birthday=#{userBirthday},
+            bardian_sign=#{bardianSign},
+            headimg_url=#{headimgUrl},
+            register_time=#{registerTime},
+            user_email=#{userEmail},
+        </set>
+        WHERE user_id=#{userId}
+    </update>
+    <delete id="deleteUser">
+        DELETE FROM Tb_user
+        WHERE user_id=#{userId}
+    </delete>
+</mapper>

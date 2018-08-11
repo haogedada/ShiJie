@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="com.haoge.shijie.dao.UserFriendsDao">
+
+    <!--
+        动态代理的开发规范
+            1: 映射文件的namespace必须等于接口的全路径名称
+            2: 映射文件的sql唯一标示,必须等于接口的方法名称
+            3: 映射文件的parameterType必须等于接口方法的参数类型
+            4: 映射文件resultType必须等于接口方法的返回类型
+     -->
+<!--sql多个查询-->
+
+    <resultMap type="com.haoge.shijie.pojo.UserFriendsBean" id="ResultMap">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="friendId" column="friend_id"/>
+        <result property="friendType" column="friend_type"/>
+        <result property="creatTime" column="creat_time"/>
+        <association property="user" javaType="com.haoge.shijie.pojo.UserBean">
+            <id property="userId" column="user_id"/>
+            <result property="userName" column="user_name"/>
+            <result property="userPassword" column="user_password"/>
+            <result property="userNickname" column="user_nickname"/>
+            <result property="userSex" column="user_sex"/>
+            <result property="userBirthday" column="user_birthday"/>
+            <result property="bardianSign" column="bardian_sign"/>
+            <result property="headimgUrl" column="headimg_url"/>
+            <result property="registerTime" column="register_time"/>
+            <result property="userEmail" column="user_email"/>
+            <result property="headimgUrl" column="headimg_url"/>
+        </association>
+    </resultMap>
+
+    <select id="queryFriendByIdAndType" resultType="com.haoge.shijie.pojo.UserBean">
+        SELECT
+        u.*
+        FROM
+       Tb_user u,Tb_userfriendes f
+        WHERE f.user_id=#{userId} AND f.friend_type=#{friendType}  AND f.friend_id=u.user_id
+    </select>
+    <insert id="insertUserFriend" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="com.haoge.shijie.pojo.UserFriendsBean" >
+           INSERT INTO
+        Tb_userfriendes(user_id,friend_id,friend_type,creat_time)
+        VALUES(#{userId},#{friendId},#{friendType},#{creatTime})
+    </insert>
+    <update id="updateUserFriend" parameterType="com.haoge.shijie.pojo.UserFriendsBean" >
+        UPDATE  Tb_userfriendes
+        <set>
+            <if test="userId!=null">user_id=#{userId},</if>
+            <if test="friendId!=null">friend_id=#{friendId},</if>
+            <if test="friendType!=null">friend_type=#{friendType},</if>
+            creat_time=#{creatTime},
+        </set>
+        WHERE id=#{id}
+    </update>
+    <delete id="deleteUserFriend">
+        DELETE FROM Tb_userfriendes
+        WHERE user_id=#{userId} AND friendId=#{friendId}
+    </delete>
+</mapper>
