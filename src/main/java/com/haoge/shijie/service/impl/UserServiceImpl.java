@@ -10,6 +10,8 @@ import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,13 +21,17 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 @Service
+@Component
 public class UserServiceImpl implements UserService {
-
+    private final static String S = java.io.File.separator;
     private final static String FANS="fans";
     private final static String FOLLOW="follow";
-    private final static String VIDEOPATH="http://www.haogedada.top/api/upLoadFile/videoFile/";
-    private final static String HEADPATH="http://www.haogedada.top/api/upLoadFile/pictureFile/headImage/";
-    private final static String VIDEOCOVERPATH="http://www.haogedada.top/api/upLoadFile/videoCover/";
+    private final static String VIDEOURL="http://www.haogedada.top/api/upLoadFile/videoFile/";
+    private final static String HEADURL="http://www.haogedada.top/api/upLoadFile/pictureFile/headImage/";
+    private final static String VIDEOCOVERURL="http://www.haogedada.top/api/upLoadFile/videoCover/";
+    private final static String VIDEOPATH="videoFile"+S;
+    private final static String HEADPATH="pictureFile"+S+"headImage"+S;
+    private final static String VIDEOCOVERPATH="videoCover"+S;
     //private final static String VIDEOPATH="http://127.0.0.1:8080/upLoadFile/videoFile/";
     //private final static String HEADPATH="http://127.0.0.1:8080/upLoadFile/pictureFile/headImage/";
     //private final static String VIDEOPATH="http://127.0.0.1:8080/upLoadFile/videoFile/";
@@ -122,7 +128,7 @@ public class UserServiceImpl implements UserService {
                 &&StrJudgeUtil.isCorrectStr(email)){
             if((userName.length()>=3&&userName.length() < 20)&&
                     (userPassword.length() < 16&&userPassword.length()>=8)) {
-                if (email.matches("^\\w+@(\\w+\\.)+\\w+$")) {
+                if (StrJudgeUtil.isEmail(email)) {
                     UserBean userBean=new UserBean();
                     userBean.setUserName(userName);
                     userBean.setUserPassword(userPassword);
@@ -167,51 +173,37 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-
     @Override
     @Transactional
-    public boolean modifyUser(UserBean user) {
-        if(user.getUserId()!=null && user.getUserId()>0){
-            try {
-                int row = userDao.updateUser(user);
-                if(row>0){
-                    return true;
-                }else {
-                    throw new RuntimeException("user更新用户信息失败！");
-                }
-            }catch (Exception e){
-                throw new RuntimeException("user更新用户信息失败："+e.getMessage());
-            }
-        }else{
-            throw new RuntimeException("（user）用户id不能为空！");
-        }
-    }
-
-    @Override
-    @Transactional
-    public String modifyUser(String nickName, String sex,String birthday,String sign
-            ,String token,String fileType) {
-       if(StrJudgeUtil.isCorrectStr(nickName)&&
-          StrJudgeUtil.isCorrectStr(sex)&&
-          StrJudgeUtil.isCorrectStr(birthday)){
+    public boolean modifyUser(UserBean userBean,String token,MultipartFile file, String filePath) {
+       if(StrJudgeUtil.isCorrectStr(userBean.getUserNickname())&&
+          StrJudgeUtil.isCorrectStr(userBean.getUserSex())&&
+          StrJudgeUtil.isCorrectStr(userBean.getBardianSign())&&
+          StrJudgeUtil.isCorrectStr(userBean.getUserBirthday())){
+           String fileType = file.getContentType();
+           MultipartFile [] files=new MultipartFile[]{file};
+           String [] filesPath=new String[]{filePath+HEADPATH};
+           String [] filesName=null;
            if(FileUtil.isImageFile(fileType)) {
                String username = JWTUtil.getUsername(token);
                String ext = FileUtil.fileTypeConvert(fileType);
-               UserBean userBean = userDao.queryUserByName(username);
+               UserBean userBean1 = userDao.queryUserByName(username);
                String fileName=userBean.getUserId()+ext;
-               userBean.setUserNickname(nickName);
-               userBean.setHeadimgUrl(HEADPATH+fileName);
-               userBean.setUserSex(sex);
-               userBean.setBardianSign(sign);
-               userBean.setUserBirthday(birthday);
+               filesName=new String[]{fileName};
+               userBean1.setUserNickname(userBean.getUserNickname());
+               userBean1.setHeadimgUrl(HEADURL+fileName);
+               userBean1.setUserSex(userBean.getUserSex());
+               userBean1.setBardianSign(userBean.getBardianSign());
+               userBean1.setUserBirthday(userBean.getUserBirthday());
                try {
+                  boolean success= upLoadFile(files,filesPath,filesName);
                    int res=userDao.updateUser(userBean);
-                   if(res>0){
-                       return fileName;
+                   if(res>0&&success){
+                       return true;
                    }else {
-                       return "fail";
+                      return false;
                    }
-               }catch (Exception e){
+               } catch (Exception e) {
                    throw new RuntimeException(e.getMessage()+"修改资料出错");
                }
            }else {
@@ -316,8 +308,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public String [] addVideo(String title, String content, String token,MultipartFile[] file) {
+    public boolean addVideo(String title, String content, String token,MultipartFile[] file,String filePath) {
         String [] fileType=null;
+        String [] filesPath = new String[] {filePath+VIDEOPATH,filePath+VIDEOCOVERPATH};
         if(file.length==1){
             fileType = new String[]{file[0].getContentType()};
         }else if(file.length==2){
@@ -325,56 +318,61 @@ public class UserServiceImpl implements UserService {
         }
         //视频格式的判断
         if(!FileUtil.isVedioFile(fileType[0])){
-                      return new String[]{"a"};
+            throw new RuntimeException("上传视频文件格式错误");
         }else if(file.length==2){
             if(!FileUtil.isImageFile(fileType[1])){
-                return new String[]{"a"};
+                throw new RuntimeException("上传封面文件格式错误");
             }
         }
         if(StrJudgeUtil.isCorrectStr(title)&&StrJudgeUtil.isCorrectStr(content)){
             UserBean user=userDao.queryUserByName(JWTUtil.getUsername(token));
-            VideoBean videoBean=new VideoBean();
-            videoBean.setUserId(user.getUserId());
-            videoBean.setVideoTitle(title);
-            videoBean.setVideoContent(content);
-            videoBean.setPlayerCount(0);
-            videoBean.setVideoTipNum(0);
-            videoBean.setVideoTrampleNum(0);
-            videoBean.setVideoUrl(null);
-            videoBean.setVideoCoverUrl(null);
-            try {
-                int res=videoDao.insertVideo(videoBean);
-                if(res>0){
-                    VideoBean videoBean1=videoDao.queryVideosLast();
-                    //根据videoType获取文件后缀名
-                    String videoext= FileUtil.fileTypeConvert(fileType[0]);
-                    String videoName=videoBean1.getVideoId()+videoext;
-                    String coverName=null;
-                    //判断用户是否上传封面，有就用用户的封面保存到数据库，无就自动生成
-                    if (file.length==1&&fileType.length==1){
-                         coverName=videoBean1.getVideoId()+".jpg";
-                    }else if(file.length==2&&fileType.length==2){
-                         String coverext= FileUtil.fileTypeConvert(fileType[1]);
-                         coverName=videoBean1.getVideoId()+coverext;
-                    }
-                    videoBean1.setVideoUrl(VIDEOPATH+videoName);
-                    videoBean1.setVideoCoverUrl(VIDEOCOVERPATH+coverName);
-                        int upres = videoDao.updateVideo(videoBean1);
-                        if (upres > 0) {
-                            return new String[] {videoName,coverName};
-                        } else {
-                            throw new RuntimeException("视频更新失败");
-                        }
-                }else {
-                    throw new RuntimeException("视频插入失败");
+            Integer videoId=videoDao.queryVideoLastId();
+            if(StrJudgeUtil.isCorrectInt(videoId)){
+                //根据videoType获取文件后缀名
+                String videoext= FileUtil.fileTypeConvert(fileType[0]);
+                String videoName=videoId+videoext;
+                String coverName=null;
+                String [] filesName=null;
+                //判断用户是否上传封面，
+                if (file.length==1&&fileType.length==1){
+                    coverName=videoId+".jpg";
+                }else if(file.length==2&&fileType.length==2){
+                    String coverext= FileUtil.fileTypeConvert(fileType[1]);
+                    coverName=videoId+coverext;
                 }
-            }catch (Exception e){
-                throw new RuntimeException(e.getMessage()+"视频插入出错");
+                filesName=new String[] {videoName,coverName};
+                try {
+                   boolean success= upLoadFile(file,filesPath,filesName);
+                   if (success){
+                       //获取视频时间并转换为时长制
+                       int time=FileUtil.getVideoTime(filesPath[0]+filesName[0]);
+                       String videoTime=DateUtil.secToTime(time);
+                       VideoBean videoBean=new VideoBean();
+                       videoBean.setUserId(user.getUserId());
+                       videoBean.setVideoTitle(title);
+                       videoBean.setVideoContent(content);
+                       videoBean.setPlayerCount(0);
+                       videoBean.setVideoTipNum(0);
+                       videoBean.setVideoTrampleNum(0);
+                       videoBean.setVideoUrl(VIDEOURL+videoName);
+                       videoBean.setVideoCoverUrl(VIDEOCOVERURL+coverName);
+                       videoBean.setVideoTime(videoTime);
+                           int res = videoDao.insertVideo(videoBean);
+                           if(res>0){
+                               return true;
+                           }else {
+                               throw new RuntimeException("插入视频失败");
+                           }
+                   }else {
+                       return false;
+                   }
+                } catch (Exception e) {
+                    throw new RuntimeException("上传文件出错"+e.getMessage());
+                }
             }
         }
-        return new String[]{"b"};
+        return false;
     }
-
     /**
      * 发送验证码邮件，设置邮件类型为验证码
      * @param userName,email
@@ -384,6 +382,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean getUserCode(String userName, String email) {
+
        UserBean userBean=userDao.queryUserByName(userName);
         if(userBean!=null&&userBean.getUserEmail().equals(email)){
             String code=CodeUtil.RandomCode();
@@ -403,7 +402,7 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("出现错误"+e.getMessage());
             }
         }else {
-            throw new RuntimeException("用户或邮箱不存在");
+            throw new RuntimeException("用户或邮箱不正确");
         }
     }
 
@@ -443,7 +442,6 @@ public class UserServiceImpl implements UserService {
                     }catch (Exception e){
                         throw new RuntimeException("出现错误"+e.getMessage());
                     }
-
                 }else {
                 throw new RuntimeException("验证码失效");
                 }

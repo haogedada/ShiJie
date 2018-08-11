@@ -124,12 +124,12 @@ public class FileUtil {
      * @param videoPath 视频路径
      * @return 时长（s）
      */
-    public static Long getVideoTime(String videoPath){
-        Long times = 0L;
+    public static int getVideoTime(String videoPath){
+        Integer times = 0;
         try {
-            FFmpegFrameGrabber ff = new FFmpegFrameGrabber(new File(videoPath));
+            FFmpegFrameGrabber ff = new FFmpegFrameGrabber(videoPath);
             ff.start();
-            times = ff.getLengthInTime()/(1000*1000);
+            times = (int)ff.getLengthInTime()/(1000*1000);
             ff.stop();
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,7 +25,7 @@ public interface VideoDao {
      * 查询最后插入的视频
      * @return
      */
-    VideoBean queryVideosLast();
+    Integer queryVideoLastId();
     /**
      * 新增区域信息
      * @param videoBean

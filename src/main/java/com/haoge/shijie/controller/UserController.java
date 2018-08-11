@@ -38,7 +38,6 @@ public class UserController {
         UserBean user = userService.findUserByToken(token);
         return new ResponseBean().successMethod(user);
     }
-
     //用户信息修改
     @PutMapping("/user")
     @RequiresAuthentication
@@ -51,27 +50,18 @@ public class UserController {
                                    @RequestParam("imgfile") MultipartFile file,
                                    HttpServletRequest request
                                   ) {
-        String fileType = file.getContentType();
-        String imgPath =request.getServletContext().getRealPath("/upLoadFile/pictureFile/headImage/");
-        String imgName = userService.modifyUser(nickName,sex,birthday,sign,token,fileType);
-        MultipartFile [] fileArr=new MultipartFile[]{file};
-        String [] filePath=new String[]{imgPath};
-        String [] fileName=new String[]{imgName};
-        if(!imgName.equals("fail")){
-            try {
-                boolean success=userService.upLoadFile(fileArr,filePath,fileName);
-            if(success){
-                return new ResponseBean().successMethod();
-            }else {
-                return new ResponseBean().failMethod(500,"文件上传失败");
-            }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        UserBean userBean=new UserBean();
+        userBean.setUserNickname(nickName);
+        userBean.setUserSex(sex);
+        userBean.setUserBirthday(birthday);
+        userBean.setBardianSign(sign);
+        String filePath =request.getServletContext().getRealPath("/upLoadFile");
+        boolean success = userService.modifyUser(userBean,token,file,filePath);
+        if(success){
+            return new ResponseBean().successMethod();
         }else {
             return new ResponseBean().failMethod(500,"修改个人资料失败");
         }
-        return new ResponseBean().failMethod(500,"修改个人资料失败");
     }
     //返回用户个人首页 通过token
     @GetMapping("/user/userhome")
@@ -117,7 +107,7 @@ public class UserController {
         return new ResponseBean().successMethod(userHome);
     }
 
-    //处理文件上传
+    //视频上传
     @PostMapping("/user/upload/video")
     @RequiresAuthentication
     @SerializedField(includes={"code","msg","data"},encryptions = {"data"})
@@ -126,28 +116,14 @@ public class UserController {
                                   @RequestParam("content") String content,
                                   @RequestHeader("Authorization") String token,
                                           HttpServletRequest request)   {
-        String [] fileName=userService.addVideo(title,content,token,file);
+        String filePath=request.getServletContext().getRealPath("/upLoadFile/");
+        boolean success=userService.addVideo(title,content,token,file,filePath);
         //String fileName = file.getOriginalFilename();
-        String videoPath = request.getSession().getServletContext().getRealPath("/upLoadFile/videoFile/");
-        String videoCoverPath=request.getSession().getServletContext().getRealPath("/upLoadFile/videoCover/");
-        String [] filePath=new String[]{videoPath,videoCoverPath};
-        if(fileName[0].equals("b")){
-            return new ResponseBean().failMethod(500,"b上传失败");
-        }else if(fileName[0].equals("a")){
-            return new ResponseBean().failMethod(500,"上传文件格式错误");
+        if(success){
+            return new ResponseBean().successMethod();
         }else {
-            try {
-                boolean success=userService.upLoadFile(file,filePath,fileName);
-                if(success){
-                    return new ResponseBean().successMethod();
-                }else {
-                    return new ResponseBean().failMethod(500,"上传失败");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return new ResponseBean().failMethod(500,"上传失败");
         }
-        return new ResponseBean().failMethod(500,"出错啦");
     }
     //获取邮箱验证码
     @GetMapping("/forgetPassword/code")
@@ -161,7 +137,6 @@ public class UserController {
             return new ResponseBean().failMethod(500,"获取验证码失败");
         }
     }
-
     //修改密码
     @PutMapping("/forgetPassword")
     @SerializedField(includes={"code","msg","data"})

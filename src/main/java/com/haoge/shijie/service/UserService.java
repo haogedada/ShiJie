@@ -81,17 +81,10 @@ public interface UserService {
 
     /**
      * 修改区域信息
-     * @param user
-     * @return
-     */
-    boolean modifyUser(UserBean user);
-
-    /**
-     * 修改区域信息
      * @param
      * @return
      */
-    String modifyUser(String nickName, String sex,String birthday,String sign,String token,String fileType);
+    boolean modifyUser(UserBean userBean,String token,MultipartFile file, String filePath);
     /**
      * 根据id删除区域
      * @param userID
@@ -137,7 +130,7 @@ public interface UserService {
      * @param title,content,token
      * @return
      */
-    String [] addVideo(String title, String content, String token,MultipartFile[] file);
+    boolean addVideo(String title, String content, String token,MultipartFile[] file,String filePath);
     /**
      * 获取验证码
      * @param userName,email

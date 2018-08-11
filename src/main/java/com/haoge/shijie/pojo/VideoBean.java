@@ -4,7 +4,7 @@ package com.haoge.shijie.pojo;
 import java.sql.Timestamp;
 
 public class VideoBean {
-    private String videoTitle,videoContent,videoUrl,videoCoverUrl;
+    private String videoTitle,videoContent,videoUrl,videoCoverUrl,videoTime;
     private Integer videoId,userId,playerCount,videoTipNum,videoTrampleNum;
     private Timestamp videoCreatTime;
     private UserBean userBean;
@@ -113,5 +113,13 @@ public class VideoBean {
 
     public void setVideoCoverUrl(String videoCoverUrl) {
         this.videoCoverUrl = videoCoverUrl;
+    }
+
+    public String getVideoTime() {
+        return videoTime;
+    }
+
+    public void setVideoTime(String videoTime) {
+        this.videoTime = videoTime;
     }
 }

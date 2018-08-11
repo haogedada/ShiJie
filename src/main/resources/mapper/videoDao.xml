@@ -22,6 +22,7 @@
         <result property="videoTrampleNum" column="video_trample_num"/>
         <result property="videoUrl" column="video_url"/>
         <result property="videoCoverUrl" column="video_cover_url"/>
+        <result property="videoTime" column="video_time"/>
         <result property="videoCreatTime" column="video_creat_time"/>
         <association property="userBean" javaType="com.haoge.shijie.pojo.UserBean">
             <id property="userId" column="user_id"/>
@@ -52,11 +53,16 @@
         WHERE
         t.user_id=#{userId}
     </select>
-    <select id="queryVideosLast" resultType="com.haoge.shijie.pojo.VideoBean">
-       SELECT *
-        FROM Tb_video t
-        ORDER BY t.video_creat_time
-         DESC limit 0,1
+    <select id="queryVideoLastId" resultType="int">
+        SELECT
+        AUTO_INCREMENT
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_NAME='Tb_video'
+--  时间排序
+--        SELECT *
+--         FROM Tb_video t
+--         ORDER BY t.video_creat_time
+--          DESC limit 0,1
     </select>
     <!--<select id="queryCountByUid">-->
        <!--SELECT-->
@@ -76,8 +82,8 @@
             keyColumn="video_id" parameterType="com.haoge.shijie.pojo.VideoBean" >
         INSERT INTO
         Tb_video
-        (user_id,video_title,video_content,player_count,video_tip_num,video_trample_num,video_url,video_creat_time,video_cover_url)
-        VALUES(#{userId},#{videoTitle},#{videoContent},#{playerCount},#{videoTipNum},#{videoTrampleNum},#{videoUrl},#{videoCreatTime},#{videoCoverUrl})
+        (user_id,video_title,video_content,player_count,video_tip_num,video_trample_num,video_url,video_creat_time,video_cover_url,video_time)
+        VALUES(#{userId},#{videoTitle},#{videoContent},#{playerCount},#{videoTipNum},#{videoTrampleNum},#{videoUrl},#{videoCreatTime},#{videoCoverUrl},#{videoTime})
     </insert>
     <update id="updateVideo" parameterType="com.haoge.shijie.pojo.VideoBean" >
         UPDATE  Tb_video
@@ -90,6 +96,7 @@
             player_count=#{playerCount},
             video_tip_num=#{videoTipNum},
             video_trample_num=#{videoTrampleNum},
+            video_time=#{videoTime},
             video_creat_time=#{videoCreatTime},
         </set>
         WHERE video_id=#{videoId}
