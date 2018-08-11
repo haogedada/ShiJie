@@ -85,13 +85,6 @@
         WHERE u.user_id=#{userId} AND a.user_id=#{userId}
     </select>
 
-    <select id="queryUserAndVdoById" resultType="com.haoge.shijie.pojo.UserBean" resultMap="userResultMap">
-        SELECT
-        *
-        FROM
-        Tb_user u,Tb_video v
-        WHERE u.user_id=#{userId} AND v.user_id=#{userId}
-    </select>
 
     <select id="queryUserAndFriendById" resultType="com.haoge.shijie.pojo.UserBean" resultMap="userResultMap">
         SELECT

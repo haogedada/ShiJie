@@ -5,6 +5,7 @@ import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.UserHomeBean;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface UserService {
@@ -41,15 +42,6 @@ public interface UserService {
      * @return
      */
     UserBean findUserAndFriendById(Integer userId,String friendType);
-
-    /**
-     * 根据id查询关联视频表区域
-     * @param userId
-     * @return
-     */
-    UserBean findUserAndVdoById(Integer userId);
-
-
 
     /**
      * 根据token查询区域
@@ -153,4 +145,35 @@ public interface UserService {
      * @return
      */
     boolean upLoadFile(MultipartFile[] file, String [] filePath, String [] fileName) throws Exception;
+
+    /**
+     * 删除视频
+     * @param token
+     * @param videoId
+     * @return
+     */
+    boolean delVideo(String token, Integer videoId);
+
+    /**
+     *修改视频及修改封面
+     * @param videoBean
+     * @param token
+     * @param filePath
+     * @param coverFile
+     * @return
+     */
+    boolean modifyVideo(VideoBean videoBean, String token, String filePath, MultipartFile coverFile);
+    /**
+     * 仅仅修改视频信息
+     * @param request
+     * @return
+     */
+    boolean modifyVideo(HttpServletRequest request);
+
+    /**
+     * 根据视频id查找视频
+     * @param videoId
+     * @return
+     */
+    VideoBean findVideo(Integer videoId);
 }

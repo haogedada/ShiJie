@@ -26,12 +26,6 @@ public interface UserDao {
      */
     UserBean queryUserAndAuxById(Integer userId);
 
-    /**
-     * 根据id查询关联Video表信息区域
-     * @param userId
-     * @return
-     */
-    UserBean queryUserAndVdoById(Integer userId);
 
     /**
      * 根据id查询关联Friend表信息区域

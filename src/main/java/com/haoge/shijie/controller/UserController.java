@@ -10,24 +10,21 @@ import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.FileUtil;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.concurrent.Future;
 
 @RestController //@RequestMapping("/user")
 public class UserController {
-
     private final static String FANS="fans";
     private final static String FOLLOW="follow";
+    private final static String UPLOADPATH="/upLoadFile/";
     @Autowired
     private UserService userService;
     @Autowired
     private FileUtil fileUtil;
-
     /** Log4j日志处理 */
     //private static final Logger log = Logger.getLogger(UserController.class);
     //返回用户个人信息 通过token
@@ -55,7 +52,7 @@ public class UserController {
         userBean.setUserSex(sex);
         userBean.setUserBirthday(birthday);
         userBean.setBardianSign(sign);
-        String filePath =request.getServletContext().getRealPath("/upLoadFile/");
+        String filePath =request.getServletContext().getRealPath(UPLOADPATH);
         boolean success = userService.modifyUser(userBean,token,file,filePath);
         if(success){
             return new ResponseBean().successMethod();
@@ -79,7 +76,6 @@ public class UserController {
         List<VideoBean> videos=userService.goCollectionList(token);
         return new ResponseBean().successMethod(videos);
     }
-
 
     //返回用户关注列表
     @GetMapping("/user/followList")
@@ -107,29 +103,11 @@ public class UserController {
         return new ResponseBean().successMethod(userHome);
     }
 
-    //视频上传
-    @PostMapping("/user/upload/video")
-    @RequiresAuthentication
-    @SerializedField(includes={"code","msg","data"},encryptions = {"data"})
-    public ResponseBean uploadVideo(@RequestParam("file") MultipartFile[] file,
-                                  @RequestParam("title") String title,
-                                  @RequestParam("content") String content,
-                                  @RequestHeader("Authorization") String token,
-                                          HttpServletRequest request)   {
-        String filePath=request.getServletContext().getRealPath("/upLoadFile/");
-        boolean success=userService.addVideo(title,content,token,file,filePath);
-        //String fileName = file.getOriginalFilename();
-        if(success){
-            return new ResponseBean().successMethod();
-        }else {
-            return new ResponseBean().failMethod(500,"上传失败");
-        }
-    }
     //获取邮箱验证码
     @GetMapping("/forgetPassword/code")
     @SerializedField(includes={"code","msg","data"})
     public ResponseBean getEmailCode(@RequestParam("username") String userName,
-                                      @RequestParam("email") String email){
+                                     @RequestParam("email") String email){
         boolean success=userService.getUserCode(userName,email);
         if(success){
             return new ResponseBean().successMethod();
@@ -149,6 +127,73 @@ public class UserController {
         }else {
             return new ResponseBean().failMethod(500,"修改密码失败");
         }
+    }
+
+    //视频上传
+    @PostMapping("/user/video")
+    @RequiresAuthentication
+    @SerializedField(includes={"code","msg","data"},encryptions = {"data"})
+    public ResponseBean upLoadVideo(@RequestParam("file") MultipartFile[] file,
+                                  @RequestParam("title") String title,
+                                  @RequestParam("content") String content,
+                                  @RequestHeader("Authorization") String token,
+                                          HttpServletRequest request)   {
+
+        System.out.println(file.length+"|"+file[0].isEmpty());
+        String filePath=request.getServletContext().getRealPath(UPLOADPATH);
+        boolean success=userService.addVideo(title,content,token,file,filePath);
+        //String fileName = file.getOriginalFilename();
+        if(success){
+            return new ResponseBean().successMethod();
+        }else {
+            return new ResponseBean().failMethod(500,"上传失败");
+        }
+    }
+
+    //获取视频
+    @GetMapping("/user/video")
+    @SerializedField(includes={"code","msg","data"})
+    public ResponseBean getVideo(@RequestParam("videoId") Integer videoId){
+        VideoBean videoBean=userService.findVideo(videoId);
+        return new ResponseBean().successMethod(videoBean);
+    }
+    //删除视频
+    @DeleteMapping("/user/video")
+    @SerializedField(includes={"code","msg","data"})
+    public ResponseBean delVideo(@RequestHeader("Authorization") String token,
+                                       @RequestParam("videoId") Integer videoId
+                                      ){
+        boolean success=userService.delVideo(token,videoId);
+        if(success){
+            return new ResponseBean().successMethod();
+        }else {
+            return new ResponseBean().failMethod(500,"删除失败");
+        }
+    }
+    //修改视频
+    @PutMapping("user/video")
+    @SerializedField(includes={"code","msg","data"})
+    public ResponseBean modifyVideo(@RequestHeader("Authorization") String token,
+                                    @RequestParam("videoId") Integer videoId,
+                                    @RequestParam("title") String videoTitle,
+                                    @RequestParam("content") String videoContent,
+                                    @RequestParam("coverfile") MultipartFile coverFile,
+                                     HttpServletRequest request){
+        if(coverFile.isEmpty()){
+            throw new RuntimeException("上传文件为空");
+        }
+        VideoBean videoBean=new VideoBean();
+        videoBean.setVideoId(videoId);
+        videoBean.setVideoTitle(videoTitle);
+        videoBean.setVideoContent(videoContent);
+        String filePath=request.getServletContext().getRealPath(UPLOADPATH);
+        boolean success=userService.modifyVideo(videoBean,token,filePath,coverFile);
+        if (success){
+            return new ResponseBean().successMethod();
+        }else {
+            return new ResponseBean().failMethod(500,"修改失败");
+        }
+
     }
 
 //

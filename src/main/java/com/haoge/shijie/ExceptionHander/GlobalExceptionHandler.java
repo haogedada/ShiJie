@@ -2,8 +2,11 @@ package com.haoge.shijie.ExceptionHander;
 
 
 
+import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.response.ResponseBean;
+import com.haoge.shijie.service.UserService;
 import org.apache.shiro.ShiroException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -22,6 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Autowired
+    private UserService userService;
+
     // Log4j日志处理(@author: rico)
     //private static final Logger log = Logger.getLogger(GlobalExceptionHandler.class);
 
@@ -35,7 +41,7 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException e) {
         // log.error("could_not_read_json...", e);
         // return new response().failure("无法读取JSON");
-        return new ResponseBean(400, "unable to read JSON", null);
+        return new ResponseBean(431, "unable to read JSON", null);
     }
     /**
      * 400 - Bad Request
@@ -95,7 +101,13 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ResponseBean globalException(HttpServletRequest request, Throwable ex) {
+    public @ResponseBody ResponseBean globalException(HttpServletRequest request, Exception ex)  {
+       if(ex.getMessage().equals("Required request part 'coverfile' is not present")){
+          boolean success= userService.modifyVideo(request);
+          if (success){
+              return new ResponseBean().successMethod();
+          }
+       }
         return new ResponseBean().failMethod(getStatus(request).value(), ex.getMessage());
     }
 

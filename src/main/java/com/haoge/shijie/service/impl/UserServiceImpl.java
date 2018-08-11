@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -32,6 +33,9 @@ public class UserServiceImpl implements UserService {
     private final static String VIDEOPATH="videoFile"+S;
     private final static String HEADPATH="headImage"+S;
     private final static String VIDEOCOVERPATH="videoCover"+S;
+    private final static String HEADIMGPREFIX="userheadimg-",COVERIMGPREFIX="videocover-",VIDEOPREFIX="video";
+    private final static String USERROLE="user",MAILTYPEACT="activation";
+
     //private final static String VIDEOPATH="http://127.0.0.1:8080/upLoadFile/videoFile/";
     //private final static String HEADPATH="http://127.0.0.1:8080/upLoadFile/pictureFile/headImage/";
     //private final static String VIDEOPATH="http://127.0.0.1:8080/upLoadFile/videoFile/";
@@ -48,33 +52,102 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FileUtil fileUtil;
 
+    /**
+     * 用户列表
+     * @return
+     */
     @Override
     public List<UserBean> findUsers() {
-        return userDao.queryUserList();
+        List<UserBean> userBeans=userDao.queryUserList();
+        if(userBeans.size()>0){
+            return userBeans;
+        }else {
+            throw new RuntimeException("用户列表为空");
+        }
     }
+
+    /**
+     * 通过userId查找用户
+     * @param userId
+     * @return userBean 用户信息
+     */
     @Override
     public UserBean findUserById(Integer userId) {
-        return userDao.queryUserById(userId);
+        if(StrJudgeUtil.isCorrectInt(userId)) {
+            UserBean userBean = userDao.queryUserById(userId);
+            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
+                return userBean;
+            } else {
+                throw new RuntimeException("findUserById错误");
+            }
+        }else {
+            throw new RuntimeException("userId不合法");
+        }
     }
 
+    /**
+     * 通过用户id查询关联AuxiliaryUser表信息区域
+     * @param userId
+     * @return
+     */
     @Override
     public UserBean findUserAndAuxById(Integer userId) {
-        return  userDao.queryUserAndAuxById(userId);
+        if(StrJudgeUtil.isCorrectInt(userId)) {
+            UserBean userBean = userDao.queryUserAndAuxById(userId);
+            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
+                return userBean;
+            } else {
+                throw new RuntimeException("findUserAndAuxById错误");
+            }
+        }else {
+            throw new RuntimeException("userId不合法");
+        }
+
     }
+    /**
+     * 通过用户id查询关联Collection表信息区域
+     * @param userId
+     * @return
+     */
     @Override
     public UserBean findUserAndCollById(Integer userId) {
-        return  userDao.queryUserAndCollById(userId);
+        if(StrJudgeUtil.isCorrectInt(userId)) {
+            UserBean userBean = userDao.queryUserAndCollById(userId);
+            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
+                return userBean;
+            } else {
+                throw new RuntimeException("findUserAndCollById");
+            }
+        }else {
+            throw new RuntimeException("userId不合法");
+        }
     }
+
+    /**
+     * 通过用户id和关系类型查询关联Friend表信息区域
+     * @param userId
+     * @return
+     */
     @Override
     public UserBean findUserAndFriendById(Integer userId,String friendType) {
-        return  userDao.queryUserAndFriendById(userId,friendType);
-    }
-    @Override
-    public UserBean findUserAndVdoById(Integer userId) {
-        return  userDao.queryUserAndVdoById(userId);
+        if(StrJudgeUtil.isCorrectInt(userId)&&
+                (friendType.equals(FANS)||friendType.equals(FOLLOW))) {
+            UserBean userBean = userDao.queryUserAndFriendById(userId,friendType);
+            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
+                return userBean;
+            } else {
+                throw new RuntimeException("findUserAndFriendById");
+            }
+        }else {
+            throw new RuntimeException("userId不合法");
+        }
     }
 
-
+    /**
+     * 通过token查找用户
+     * @param token
+     * @return
+     */
     @Override
     public UserBean findUserByToken(String token) {
         String userName=JWTUtil.getUsername(token);
@@ -82,6 +155,11 @@ public class UserServiceImpl implements UserService {
         userBean.setUserPassword("");
         return userBean;
     }
+    /**
+     * 通过token查找用户相关信息
+     * @param token
+     * @return
+     */
     @Override
     public UserHomeBean goUserHomeByToken(String token) {
         String userName=JWTUtil.getUsername(token);
@@ -141,13 +219,13 @@ public class UserServiceImpl implements UserService {
                             UserBean user=userDao.queryUserByName(userName);
                             AuxiliaryUserBean auxiliaryUserBean=new AuxiliaryUserBean();
                             auxiliaryUserBean.setUserId(user.getUserId());
-                            auxiliaryUserBean.setUserRole("user");
+                            auxiliaryUserBean.setUserRole(USERROLE);
                             auxiliaryUserBean.setUserCode(code);
                             auxiliaryUserBean.setCode(dataCode);
                             try {
                                 int ares = auxiliaryUserDao.insertAuxiliaryUser(auxiliaryUserBean);
                                 if (ares > 0) {
-                                    String mailType="activation";
+                                    String mailType=MAILTYPEACT;
                                     new Thread(new MailUtil(email, code,mailType)).start();
                                     return true;
                                 }else {
@@ -173,6 +251,14 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    /**
+     * 修改用户信息
+     * @param userBean
+     * @param token
+     * @param file
+     * @param filePath
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyUser(UserBean userBean,String token,MultipartFile file, String filePath) {
@@ -188,7 +274,7 @@ public class UserServiceImpl implements UserService {
                String username = JWTUtil.getUsername(token);
                String ext = FileUtil.fileTypeConvert(fileType);
                UserBean userBean1 = userDao.queryUserByName(username);
-               String fileName=userBean1.getUserId()+ext;
+               String fileName=HEADIMGPREFIX+userBean1.getUserId()+ext;
                filesName=new String[]{fileName};
                userBean1.setUserNickname(userBean.getUserNickname());
                userBean1.setHeadimgUrl(HEADURL+fileName);
@@ -330,15 +416,15 @@ public class UserServiceImpl implements UserService {
             if(StrJudgeUtil.isCorrectInt(videoId)){
                 //根据videoType获取文件后缀名
                 String videoext= FileUtil.fileTypeConvert(fileType[0]);
-                String videoName=videoId+videoext;
+                String videoName=VIDEOPREFIX+user.getUserId()+"-"+videoId+videoext;
                 String coverName=null;
                 String [] filesName=null;
                 //判断用户是否上传封面，
                 if (file.length==1&&fileType.length==1){
-                    coverName=videoId+".jpg";
+                    coverName=COVERIMGPREFIX+videoId+".jpg";
                 }else if(file.length==2&&fileType.length==2){
                     String coverext= FileUtil.fileTypeConvert(fileType[1]);
-                    coverName=videoId+coverext;
+                    coverName=COVERIMGPREFIX+videoId+coverext;
                 }
                 filesName=new String[] {videoName,coverName};
                 try {
@@ -382,7 +468,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean getUserCode(String userName, String email) {
-
        UserBean userBean=userDao.queryUserByName(userName);
         if(userBean!=null&&userBean.getUserEmail().equals(email)){
             String code=CodeUtil.RandomCode();
@@ -489,5 +574,143 @@ public class UserServiceImpl implements UserService {
             }
        }
         return false;
+    }
+
+    /**
+     * 根据视频id删除视频
+     * @param token
+     * @param videoId
+     * @return
+     */
+    @Override
+    @Transactional
+    public boolean delVideo(String token, Integer videoId) {
+        if(StrJudgeUtil.isCorrectInt(videoId)) {
+            String userName = JWTUtil.getUsername(token);
+            UserBean userBean = userDao.queryUserByName(userName);
+          VideoBean videoBean=videoDao.queryVideoByVid(videoId);
+               if (videoBean.getUserId()==userBean.getUserId()) {
+                   try {
+                       int res = videoDao.deleteVideo(videoId);
+                       if (res > 0) {
+                           return true;
+                       } else {
+                           return false;
+                       }
+                   } catch (Exception e) {
+                       throw new RuntimeException(e.getMessage());
+                   }
+               }else {
+                   throw new RuntimeException("该用户无权限进行该操作");
+               }
+        }else {
+            throw new RuntimeException("参数不合法");
+        }
+
+    }
+
+    /**
+     * 仅修改视频信息
+     * @param request
+     * @return
+     */
+    @Override
+    @Transactional
+    public boolean modifyVideo(HttpServletRequest request) {
+        Integer videoId=Integer.valueOf(request.getParameter("videoId"));
+        String title=request.getParameter("title");
+        String content=request.getParameter("content");
+        String token=request.getHeader("Authorization");
+        if(StrJudgeUtil.isCorrectInt(videoId)&&
+                StrJudgeUtil.isCorrectStr(title)&&
+                StrJudgeUtil.isCorrectStr(content)){
+            String userName=JWTUtil.getUsername(token);
+            UserBean userBean=userDao.queryUserByName(userName);
+            VideoBean videoBean=videoDao.queryVideoByVid(videoId);
+            if (userBean.getUserId()==videoBean.getUserId()){
+                   try {
+                       videoBean.setVideoTitle(title);
+                       videoBean.setVideoContent(content);
+                  int res=videoDao.updateVideo(videoBean);
+                  if (res>0){
+                      return true;
+                  }else {
+                      throw new RuntimeException("修改失败");
+                  }
+                  } catch (Exception e) {
+                       e.printStackTrace();
+                   }
+            }else {
+                throw new RuntimeException("用户无权限进行该操作");
+            }
+        }else {
+            throw new RuntimeException("参数不合法");
+        }
+        return false;
+    }
+
+    /**
+     * 修改视频信息及重新上传封面
+     * @param videoBean
+     * @param token
+     * @param filePath
+     * @param coverFile
+     * @return
+     */
+    @Override
+    @Transactional
+    public boolean modifyVideo(VideoBean videoBean, String token, String filePath, MultipartFile coverFile) {
+        if(StrJudgeUtil.isCorrectInt(videoBean.getVideoId())&&
+                StrJudgeUtil.isCorrectStr(videoBean.getVideoTitle())&&
+                StrJudgeUtil.isCorrectStr(videoBean.getVideoContent())){
+            String userName=JWTUtil.getUsername(token);
+            UserBean userBean=userDao.queryUserByName(userName);
+            VideoBean videoBean1=videoDao.queryVideoByVid(videoBean.getVideoId());
+            if (userBean.getUserId()==videoBean1.getUserId()){
+                String [] coversPath=new String[]{filePath+VIDEOCOVERPATH};
+                MultipartFile [] coversFile=new MultipartFile[]{coverFile};
+                String [] coversName=null;
+                String imgType = coverFile.getContentType();
+                if(FileUtil.isImageFile(imgType)){
+                    String coverName=COVERIMGPREFIX+videoBean1.getVideoId()+FileUtil.fileTypeConvert(imgType);
+                    coversName=new String[] {coverName};
+                    try {
+                        videoBean1.setVideoTitle(videoBean.getVideoTitle());
+                        videoBean1.setVideoContent(videoBean.getVideoContent());
+                        videoBean1.setVideoCoverUrl(coverName);
+                        boolean success=upLoadFile(coversFile,coversPath,coversName);
+                        int res=videoDao.updateVideo(videoBean1);
+                        if (res>0&&success){
+                            return true;
+                        }else {
+                            throw new RuntimeException("修改失败");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    throw new RuntimeException("文件格式非法");
+                }
+            }else {
+                throw new RuntimeException("用户无权限进行该操作");
+            }
+        }else {
+            throw new RuntimeException("参数不合法");
+        }
+        return false;
+    }
+
+    @Override
+    public VideoBean findVideo(Integer videoId) {
+        if(StrJudgeUtil.isCorrectInt(videoId)){
+            VideoBean videoBean = videoDao.queryVideoByVid(videoId);
+            if (videoBean!=null){
+                return videoBean;
+             }else {
+                throw new RuntimeException("视频不存在");
+            }
+        }else {
+            throw new RuntimeException("参数不合法");
+        }
     }
 }
