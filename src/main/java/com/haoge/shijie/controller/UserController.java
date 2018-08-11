@@ -55,7 +55,7 @@ public class UserController {
         userBean.setUserSex(sex);
         userBean.setUserBirthday(birthday);
         userBean.setBardianSign(sign);
-        String filePath =request.getServletContext().getRealPath("/upLoadFile");
+        String filePath =request.getServletContext().getRealPath("/upLoadFile/");
         boolean success = userService.modifyUser(userBean,token,file,filePath);
         if(success){
             return new ResponseBean().successMethod();

@@ -27,10 +27,10 @@ public class UserServiceImpl implements UserService {
     private final static String FANS="fans";
     private final static String FOLLOW="follow";
     private final static String VIDEOURL="http://www.haogedada.top/api/upLoadFile/videoFile/";
-    private final static String HEADURL="http://www.haogedada.top/api/upLoadFile/pictureFile/headImage/";
+    private final static String HEADURL="http://www.haogedada.top/api/upLoadFile/headImage/";
     private final static String VIDEOCOVERURL="http://www.haogedada.top/api/upLoadFile/videoCover/";
     private final static String VIDEOPATH="videoFile"+S;
-    private final static String HEADPATH="pictureFile"+S+"headImage"+S;
+    private final static String HEADPATH="headImage"+S;
     private final static String VIDEOCOVERPATH="videoCover"+S;
     //private final static String VIDEOPATH="http://127.0.0.1:8080/upLoadFile/videoFile/";
     //private final static String HEADPATH="http://127.0.0.1:8080/upLoadFile/pictureFile/headImage/";
@@ -188,7 +188,7 @@ public class UserServiceImpl implements UserService {
                String username = JWTUtil.getUsername(token);
                String ext = FileUtil.fileTypeConvert(fileType);
                UserBean userBean1 = userDao.queryUserByName(username);
-               String fileName=userBean.getUserId()+ext;
+               String fileName=userBean1.getUserId()+ext;
                filesName=new String[]{fileName};
                userBean1.setUserNickname(userBean.getUserNickname());
                userBean1.setHeadimgUrl(HEADURL+fileName);
@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService {
                userBean1.setUserBirthday(userBean.getUserBirthday());
                try {
                   boolean success= upLoadFile(files,filesPath,filesName);
-                   int res=userDao.updateUser(userBean);
+                   int res=userDao.updateUser(userBean1);
                    if(res>0&&success){
                        return true;
                    }else {
