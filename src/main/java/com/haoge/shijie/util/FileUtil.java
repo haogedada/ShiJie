@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 public class FileUtil {
     private final static String PREFIX_VIDEO="video/";
     private final static String PREFIX_IMAGE="image/";
+    private final static String TITLE="视界";
     /**
      * 异步文件上传
      * @param file,filePath,fileName 文件字节,文件路径,文件名
@@ -106,11 +107,24 @@ public class FileUtil {
         BufferedImage srcBi =converter.getBufferedImage(frame);
         int owidth = srcBi.getWidth();
         int oheight = srcBi.getHeight();
+
+        Font font = new Font("微软雅黑", Font.PLAIN, 40);
+        Color color=new Color(255,255,255,128);
+
         // 对截取的帧进行等比例缩放
         int width = 800;
         int height = (int) (((double) width / owidth) * oheight);
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         bi.getGraphics().drawImage(srcBi.getScaledInstance(width, height, Image.SCALE_SMOOTH),0, 0, null);
+        Graphics2D g = bi.createGraphics();
+        // 加水印
+        g.setColor(color);           //设置水印颜色
+        g.setFont(font);              //设置字体
+        //设置水印的坐标
+        int x =  (width - getFontWidth(font,TITLE));
+        int y =  (height - getFontHeigh(font));
+        g.drawString(TITLE, x, y);  //画出水印
+        g.dispose();
         try {
             ImageIO.write(bi, "jpg", targetFile);
         }catch (Exception e) {
@@ -119,6 +133,17 @@ public class FileUtil {
         ff.stop();
     }
 
+    private static int getFontWidth(Font font,String str){
+        return sun.font.FontDesignMetrics.getMetrics(font).stringWidth(str)+15;
+//高度
+//        System.out.println( fm.getHeight() );
+//单个字符宽度
+//        System.out.println( fm.charWidth( 'A' ));
+//整个字符串的宽度
+    }
+    private static int getFontHeigh(Font font){
+        return  sun.font.FontDesignMetrics.getMetrics(font).getHeight()-30;
+    }
     /**
      * 获取视频时长，单位为秒
      * @param videoPath 视频路径
