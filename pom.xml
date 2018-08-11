@@ -125,6 +125,7 @@
             <artifactId>ffmpeg-platform</artifactId>
             <version>3.4.2-1.4.1</version>
         </dependency>
+
     </dependencies>
     <build>
         <finalName>api</finalName>
