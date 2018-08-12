@@ -12,7 +12,7 @@
             3: 映射文件的parameterType必须等于接口方法的参数类型
             4: 映射文件resultType必须等于接口方法的返回类型
      -->
-<!--sql多个查询-->
+    <!--sql多个查询-->
     <select id="queryAuxiliaryUserList" resultType="com.haoge.shijie.pojo.AuxiliaryUserBean">
         SELECT
           *
@@ -34,13 +34,13 @@
         WHERE u.user_code=#{userCode}
     </select>
     <insert id="insertAuxiliaryUser" useGeneratedKeys="true" keyProperty="Id"
-            keyColumn="id" parameterType="com.haoge.shijie.pojo.AuxiliaryUserBean" >
+            keyColumn="id" parameterType="com.haoge.shijie.pojo.AuxiliaryUserBean">
         INSERT INTO
         Tb_auxiliary_user(user_id,user_role,user_code,code,user_permission,user_token)
         VALUES(#{userId},#{userRole},#{userCode},#{code},#{userPermission},#{userToken})
     </insert>
-    <update id="updateAuxiliaryUser" parameterType="com.haoge.shijie.pojo.AuxiliaryUserBean" >
-        UPDATE  Tb_auxiliary_user
+    <update id="updateAuxiliaryUser" parameterType="com.haoge.shijie.pojo.AuxiliaryUserBean">
+        UPDATE Tb_auxiliary_user
         <set>
             <if test="userRole!=null">user_role=#{userRole},</if>
             user_code=#{userCode},

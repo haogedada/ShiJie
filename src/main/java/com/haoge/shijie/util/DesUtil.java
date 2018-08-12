@@ -1,16 +1,15 @@
 package com.haoge.shijie.util;
 
 
-import java.io.IOException;
-import java.security.SecureRandom;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import java.io.IOException;
+import java.security.SecureRandom;
 
 public class DesUtil {
     private final static String DES = "DES";
@@ -19,7 +18,7 @@ public class DesUtil {
         //调试加密解密 key最多为8个字符
         String data = "";
         String key = "§@лa#ю*g~";
-        String data4="UazVyt4KfG+lHa8HFb5eFA==";
+        String data4 = "UazVyt4KfG+lHa8HFb5eFA==";
 
         //输出加密
         //System.out.println(encrypt(data, key));
@@ -29,6 +28,7 @@ public class DesUtil {
 
     /**
      * Description 根据键值进行加密
+     *
      * @param data
      * @param key  加密键byte数组
      * @return
@@ -42,6 +42,7 @@ public class DesUtil {
 
     /**
      * Description 根据键值进行解密
+     *
      * @param data
      * @param key  加密键byte数组
      * @return
@@ -54,12 +55,13 @@ public class DesUtil {
             return null;
         BASE64Decoder decoder = new BASE64Decoder();
         byte[] buf = decoder.decodeBuffer(data);
-        byte[] bt = decrypt(buf,key.getBytes("UTF-8"));
-        return new String(bt,"UTF-8");
+        byte[] bt = decrypt(buf, key.getBytes("UTF-8"));
+        return new String(bt, "UTF-8");
     }
 
     /**
      * Description 根据键值进行加密
+     *
      * @param data
      * @param key  加密键byte数组
      * @return
@@ -88,6 +90,7 @@ public class DesUtil {
 
     /**
      * Description 根据键值进行解密
+     *
      * @param data
      * @param key  加密键byte数组
      * @return

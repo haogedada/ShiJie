@@ -5,19 +5,20 @@ import java.util.List;
 
 public class UserBean {
     private Integer userId;
-    private String userName,userPassword,userNickname,userSex,userBirthday,
-            bardianSign,headimgUrl,userEmail;
+    private String userName, userPassword, userNickname, userSex, userBirthday,
+            bardianSign, headimgUrl, userEmail;
     private Timestamp registerTime;
     private AuxiliaryUserBean auxiliaryUserBean;
     private List<VideoBean> videoBeans;
     private List<UserFriendsBean> userFriends;
     private List<CollectionBean> collections;
-    public UserBean(){
+
+    public UserBean() {
     }
 
-    public UserBean( String userName, String userPassword, String userNickname,
-                     String userSex, String userBirthdy, String bardianSign, String headimgUrl,
-                     Timestamp registerTime, String userEmail) {
+    public UserBean(String userName, String userPassword, String userNickname,
+                    String userSex, String userBirthdy, String bardianSign, String headimgUrl,
+                    Timestamp registerTime, String userEmail) {
 
         this.userName = userName;
         this.userPassword = userPassword;

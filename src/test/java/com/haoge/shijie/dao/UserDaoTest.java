@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserDaoTest {
@@ -16,7 +14,7 @@ public class UserDaoTest {
 
     @Test
     public void queryUserById() {
-        int i=userDao.queryUserByEmail("2205584662@qq.com");
+        int i = userDao.queryUserByEmail("2205584662@qq.com");
         System.out.println(i);
     }
 }

@@ -24,7 +24,7 @@ public class DataConnConfig {
 
     @Bean(name = "dataSource")
     public ComboPooledDataSource createDataSource() throws PropertyVetoException {
-        ComboPooledDataSource dataSource=new ComboPooledDataSource();
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
         dataSource.setDriverClass(jdbcDriver);
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setUser(jdbcUsername);

@@ -13,8 +13,8 @@
         <!--使用jdbc的getGeneratedKeys获取数据库自增主键值-->
         <setting name="useGeneratedKeys" value="true"/>
         <!--使用列标签替换列别名 默认未true-->
-        <setting name="useColumnLabel" value="true" />
+        <setting name="useColumnLabel" value="true"/>
         <!--开启驼峰式命名转换：Table{create_time} -> Entity{createTime}-->
-        <setting name="mapUnderscoreToCamelCase" value="true" />
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
 </configuration>

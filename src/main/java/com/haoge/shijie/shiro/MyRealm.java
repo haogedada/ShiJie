@@ -5,7 +5,6 @@ import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.service.AuxiliaryUserService;
 import com.haoge.shijie.service.LoginService;
 import com.haoge.shijie.util.JWTUtil;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -17,7 +16,9 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class MyRealm extends AuthorizingRealm {
@@ -48,7 +49,7 @@ public class MyRealm extends AuthorizingRealm {
         UserBean user = loginService.findUserByName(username);
 
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-        AuxiliaryUserBean auxiliaryUserBean=auxiliaryUserService.findAuxiliaryUserById(user.getUserId());
+        AuxiliaryUserBean auxiliaryUserBean = auxiliaryUserService.findAuxiliaryUserById(user.getUserId());
         simpleAuthorizationInfo.addRole(auxiliaryUserBean.getUserRole());
         Set<String> permission = new HashSet<>(Arrays.asList(auxiliaryUserBean.getUserPermission().split(",")));
         simpleAuthorizationInfo.addStringPermissions(permission);
@@ -70,7 +71,7 @@ public class MyRealm extends AuthorizingRealm {
         if (userBean == null) {
             throw new AuthenticationException("User didn't existed!");
         }
-        if (! JWTUtil.verify(token, username, userBean.getUserPassword())) {
+        if (!JWTUtil.verify(token, username, userBean.getUserPassword())) {
             throw new AuthenticationException("Username or password error");
         }
         return new SimpleAuthenticationInfo(token, token, "my_realm");

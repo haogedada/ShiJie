@@ -6,13 +6,14 @@ import com.haoge.shijie.pojo.VideoBean;
 import java.util.List;
 
 public class UserHomeBean {
-    private String nickName,heardUrl;
-    private int followNum,fansNum,videoNum;
+    private String nickName, heardUrl;
+    private int followNum, fansNum, videoNum;
     private List<VideoBean> videos;
 
-    public UserHomeBean(){
+    public UserHomeBean() {
 
     }
+
     public UserHomeBean(String nickName, String heardUrl, int followNum, int fansNum,
                         int videoNum, List<VideoBean> videos) {
         this.nickName = nickName;

@@ -2,7 +2,6 @@ package com.haoge.shijie.shiro;
 
 import com.google.gson.Gson;
 import com.haoge.shijie.pojo.response.ResponseBean;
-import com.haoge.shijie.util.JWTUtil;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 
-public class JWTFilter  extends BasicHttpAuthenticationFilter {
+public class JWTFilter extends BasicHttpAuthenticationFilter {
     private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-    //距离token失效时间，小于这个时间，重新获取token
-    private static final long SHIXIAOTIME=5*60*1000;
+
     /**
      * 判断用户是否想要登入。
      * 检测header里面是否包含Authorization字段即可
@@ -33,7 +30,7 @@ public class JWTFilter  extends BasicHttpAuthenticationFilter {
     }
 
     /**
-     *用户进行登录授权
+     * 用户进行登录授权
      */
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
@@ -48,7 +45,7 @@ public class JWTFilter  extends BasicHttpAuthenticationFilter {
 
     /**
      * 所有正常的请求都会经过的方法体
-     *
+     * <p>
      * 这里我们详细说明下为什么最终返回的都是true，即允许访问
      * 例如我们提供一个地址 GET /article
      * 登入用户和游客看到的内容是不同的
@@ -62,16 +59,11 @@ public class JWTFilter  extends BasicHttpAuthenticationFilter {
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         if (isLoginAttempt(request, response)) {
             try {
+
                 executeLogin(request, response);
-                HttpServletRequest req = (HttpServletRequest) request;
-                String token = req.getHeader("Authorization");
-                // 解密获得date，用于和当前时间进行对比
-                Date tokenTime=  JWTUtil.getTokenDate(token);
-                if((tokenTime.getTime()-System.currentTimeMillis())<SHIXIAOTIME){
-                    tokenImminentFailure(response);
-                }
+
             } catch (Exception e) {
-               // System.out.println("非法请求");
+                // System.out.println("非法请求");
                 response401(response);
                 e.printStackTrace();
             }
@@ -98,17 +90,17 @@ public class JWTFilter  extends BasicHttpAuthenticationFilter {
     }
 
     /**
-     *给非法请求返回401
+     * 给非法请求返回401
      *
      * @param resp
      */
     private void response401(ServletResponse resp) {
         try {
             HttpServletResponse response = (HttpServletResponse) resp;
-            PrintWriter out =response.getWriter() ;
-            ResponseBean responseBean=new ResponseBean().failMethod(401,"unlawful request");
-            Gson gson=new Gson();
-            String errStr=gson.toJson(responseBean);
+            PrintWriter out = response.getWriter();
+            ResponseBean responseBean = new ResponseBean().failMethod(401, "unlawful request");
+            Gson gson = new Gson();
+            String errStr = gson.toJson(responseBean);
             out.write(errStr);
             out.close();
         } catch (IOException e) {
@@ -117,24 +109,6 @@ public class JWTFilter  extends BasicHttpAuthenticationFilter {
         }
     }
 
-    /**
-     *token即将失效，提示前端自己重新获取一个新的token
-     * @param resp
-     */
-    private void tokenImminentFailure(ServletResponse resp) {
-        try {
-            HttpServletResponse response = (HttpServletResponse) resp;
-            PrintWriter  out =response.getWriter() ;
-            ResponseBean responseBean=new ResponseBean().failMethod(100,"token Imminent Failure");
-            Gson gson=new Gson();
-            String errStr=gson.toJson(responseBean);
-            out.write(errStr);
-            out.close();
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            e.printStackTrace();
-        }
-    }
 }
 
 

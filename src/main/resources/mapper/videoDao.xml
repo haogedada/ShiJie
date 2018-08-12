@@ -11,7 +11,7 @@
             3: 映射文件的parameterType必须等于接口方法的参数类型
             4: 映射文件resultType必须等于接口方法的返回类型
      -->
-<!--sql多个查询-->
+    <!--sql多个查询-->
     <!--关系映射-->
     <resultMap type="com.haoge.shijie.pojo.VideoBean" id="ResultMap">
         <id property="videoId" column="video_id"/>
@@ -65,10 +65,10 @@
 --          DESC limit 0,1
     </select>
     <!--<select id="queryCountByUid">-->
-       <!--SELECT-->
-       <!--COUNT(*) FROM Tb_video t t-->
-       <!--WHERE-->
-       <!--t.user_id=#{userId}-->
+    <!--SELECT-->
+    <!--COUNT(*) FROM Tb_video t t-->
+    <!--WHERE-->
+    <!--t.user_id=#{userId}-->
     <!--</select>-->
     <select id="queryVideoByVid" resultType="com.haoge.shijie.pojo.VideoBean" resultMap="ResultMap">
         SELECT
@@ -79,14 +79,14 @@
         t.video_id=#{videoId}
     </select>
     <insert id="insertVideo" useGeneratedKeys="true" keyProperty="videoId"
-            keyColumn="video_id" parameterType="com.haoge.shijie.pojo.VideoBean" >
+            keyColumn="video_id" parameterType="com.haoge.shijie.pojo.VideoBean">
         INSERT INTO
         Tb_video
         (user_id,video_title,video_content,player_count,video_tip_num,video_trample_num,video_url,video_creat_time,video_cover_url,video_time)
         VALUES(#{userId},#{videoTitle},#{videoContent},#{playerCount},#{videoTipNum},#{videoTrampleNum},#{videoUrl},#{videoCreatTime},#{videoCoverUrl},#{videoTime})
     </insert>
-    <update id="updateVideo" parameterType="com.haoge.shijie.pojo.VideoBean" >
-        UPDATE  Tb_video
+    <update id="updateVideo" parameterType="com.haoge.shijie.pojo.VideoBean">
+        UPDATE Tb_video
         <set>
             <if test="userId!=null">user_id=#{userId},</if>
             <if test="videoTitle!=null">video_title=#{videoTitle},</if>
@@ -101,7 +101,7 @@
         </set>
         WHERE video_id=#{videoId}
     </update>
-    <update id="updateVdoTopAdd" >
+    <update id="updateVdoTopAdd">
         UPDATE
         Tb_video
         SET
@@ -115,7 +115,7 @@
         video_trample_num=video_trample_num+1
         WHERE video_id=#{videoId}
     </update>
-    <update id="updatePlayCountAdd" >
+    <update id="updatePlayCountAdd">
         UPDATE
         Tb_video
         SET

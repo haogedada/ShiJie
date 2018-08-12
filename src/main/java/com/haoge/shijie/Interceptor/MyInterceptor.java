@@ -1,7 +1,7 @@
 package com.haoge.shijie.Interceptor;
 
 import com.haoge.shijie.pojo.UserBean;
-import com.haoge.shijie.service.UserService;
+import com.haoge.shijie.service.LoginService;
 import com.haoge.shijie.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,14 +11,19 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+
 //拦截器
 @Component
 public class MyInterceptor implements HandlerInterceptor {
 
+    //距离token失效时间，小于这个时间，重新获取token
+    private static final long SHIXIAOTIME = 25 * 60 * 1000;
     @Autowired
-    private UserService userService;
+    private LoginService loginService;
+
     /**
      * 进入controller层之前拦截请求
+     *
      * @param request
      * @param response
      * @param o
@@ -27,52 +32,39 @@ public class MyInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
-       // System.out.println("---------------------开始进入请求地址拦截----------------------------");
-//        if(isLoginAttempt(request,response)) {
-//            String token = request.getHeader("Authorization");
-//            String username=null;
-//            try {
-//                 username=JWTUtil.getUsername(token);
-//            }catch (Exception e){
-//                e.printStackTrace();
-//                return false;
-//            }
-//            Date date=JWTUtil.getTokenDate(token);
-//            if(username!=null&&!username.equals("")&&
-//                    (System.currentTimeMillis() - date.getTime()<=1000*60*60*30)){
-//                    UserBean userBean=userService.findUserByToken(token);
-//                    if(userBean!=null&&userBean.getUserName()!=null){
-//                        return true;
-//                    }else {
-//                        return false;
-//                    }
-//                }else {
-//                    return false;
-//                }
-//            }else {
-//                return false;
-//            }
+        // System.out.println("---------------------开始进入请求地址拦截----------------------------");
+        try {
+            String token = request.getHeader("Authorization");
+            // 解密获得date，用于和当前时间进行对比
+            Date tokenTime = JWTUtil.getTokenDate(token);
+            //token即将失效，提示前端自己重新获取一个新的token
+            if ((System.currentTimeMillis() - tokenTime.getTime() >= SHIXIAOTIME)) {
+                String userName = JWTUtil.getUsername(token);
+                UserBean userBean = loginService.findUserByName(userName);
+                if (userBean != null && userBean.getUserName() != null) {
+                    String newToken = JWTUtil.sign(userBean.getUserName(), userBean.getUserPassword());
+                    response.addHeader("authorization", newToken);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
         return true;
     }
 
     //处理请求完成后视图渲染之前的处理操作
     @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object o, ModelAndView modelAndView) throws Exception {
         //System.out.println("--------------处理请求完成后视图渲染之前的处理操作---------------");
     }
 
     //视图渲染之后的操作
     @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-        //System.out.println("---------------视图渲染之后的操作-------------------------0");
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object o, Exception e) throws Exception {
+        // System.out.println("---------------视图渲染之后的操作-------------------------");
     }
-    /**
-     * 判断用户是否登入。
-     * 检测header里面是否包含Authorization字段即可
-     */
-    protected boolean isLoginAttempt(HttpServletRequest request, HttpServletResponse response) {
-        String authorization = request.getHeader("Authorization");
-        return authorization != null;
-    }
-
 }

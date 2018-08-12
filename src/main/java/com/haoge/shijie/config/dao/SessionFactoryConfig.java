@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-
 import javax.sql.DataSource;
 import java.io.IOException;
 
@@ -31,7 +30,7 @@ public class SessionFactoryConfig {
     @Value("${entity_package}")
     private String entityPackage;
 
-    @Bean(name="sqlSessionFactory")
+    @Bean(name = "sqlSessionFactory")
     public SqlSessionFactoryBean creatSqlSessionFactoryBean() throws IOException {
         SqlSessionFactoryBean ssfb = new SqlSessionFactoryBean();
         ssfb.setConfigLocation(new ClassPathResource(mybatisConfigFilePath));
@@ -42,4 +41,4 @@ public class SessionFactoryConfig {
         ssfb.setTypeAliasesPackage(entityPackage);
         return ssfb;
     }
-    }
+}

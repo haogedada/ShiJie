@@ -12,7 +12,7 @@
             3: 映射文件的parameterType必须等于接口方法的参数类型
             4: 映射文件resultType必须等于接口方法的返回类型
      -->
-<!--sql多个查询-->
+    <!--sql多个查询-->
 
     <resultMap type="com.haoge.shijie.pojo.UserFriendsBean" id="ResultMap">
         <id property="id" column="id"/>
@@ -43,13 +43,13 @@
         WHERE f.user_id=#{userId} AND f.friend_type=#{friendType}  AND f.friend_id=u.user_id
     </select>
     <insert id="insertUserFriend" useGeneratedKeys="true" keyProperty="id"
-            keyColumn="id" parameterType="com.haoge.shijie.pojo.UserFriendsBean" >
+            keyColumn="id" parameterType="com.haoge.shijie.pojo.UserFriendsBean">
            INSERT INTO
         Tb_userfriendes(user_id,friend_id,friend_type,creat_time)
         VALUES(#{userId},#{friendId},#{friendType},#{creatTime})
     </insert>
-    <update id="updateUserFriend" parameterType="com.haoge.shijie.pojo.UserFriendsBean" >
-        UPDATE  Tb_userfriendes
+    <update id="updateUserFriend" parameterType="com.haoge.shijie.pojo.UserFriendsBean">
+        UPDATE Tb_userfriendes
         <set>
             <if test="userId!=null">user_id=#{userId},</if>
             <if test="friendId!=null">friend_id=#{friendId},</if>

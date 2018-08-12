@@ -4,7 +4,9 @@ import com.haoge.shijie.annotation.SerializedField;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LoginController {
@@ -13,10 +15,10 @@ public class LoginController {
 
     //登录
     @PostMapping("/login")
-    @SerializedField(includes={"code","msg","data"})
+    @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean login(@RequestParam("username") String userName,
-                          @RequestParam("password") String userPassword) {
-        ResponseBean token = loginService.findToken(userName,userPassword);
+                              @RequestParam("password") String userPassword) {
+        ResponseBean token = loginService.getToken(userName, userPassword);
         return token;
     }
 

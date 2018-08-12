@@ -10,6 +10,7 @@ public interface UserFriendsDao {
 
     /**
      * 根据userId,friendType查询到好友列表
+     *
      * @param userId,friendType
      * @return
      */
@@ -18,6 +19,7 @@ public interface UserFriendsDao {
 
     /**
      * 新增区域信息
+     *
      * @param userFriend
      * @return
      */
@@ -25,6 +27,7 @@ public interface UserFriendsDao {
 
     /**
      * 修改区域信息
+     *
      * @param userFriend
      * @return
      */
@@ -32,8 +35,9 @@ public interface UserFriendsDao {
 
     /**
      * 根据id删除区域
+     *
      * @param userId
      * @return
      */
-    int deleteUserFriend(@Param("userId") Integer userId,@Param("friendId") Integer friendId);
+    int deleteUserFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
 }

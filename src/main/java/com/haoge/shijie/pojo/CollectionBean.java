@@ -3,12 +3,14 @@ package com.haoge.shijie.pojo;
 import java.sql.Timestamp;
 
 public class CollectionBean {
-    private Integer id,userId,videoId;
+    private Integer id, userId, videoId;
     private Timestamp creatTime;
     private VideoBean videoBean;
-    public CollectionBean(){
+
+    public CollectionBean() {
 
     }
+
     public CollectionBean(Integer id, Integer userId, Integer videoId, Timestamp creatTime) {
         this.id = id;
         this.userId = userId;

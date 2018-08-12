@@ -10,12 +10,15 @@ public interface CollectionDao {
 
     /**
      * 查询所有收藏列表
+     *
      * @param
      * @return
      */
     List<CollectionBean> queryCollectionList();
+
     /**
      * 根据userId查询到收藏列表
+     *
      * @param userId,friendType
      * @return
      */
@@ -23,12 +26,15 @@ public interface CollectionDao {
 
     /**
      * 根据id查询到收藏记录
+     *
      * @param id
      * @return
      */
     CollectionBean queryCollectionById(Integer id);
+
     /**
      * 新增区域信息
+     *
      * @param collection
      * @return
      */
@@ -36,6 +42,7 @@ public interface CollectionDao {
 
     /**
      * 修改区域信息
+     *
      * @param collection
      * @return
      */
@@ -43,9 +50,10 @@ public interface CollectionDao {
 
     /**
      * 根据userId,videoId删除区域
+     *
      * @param userId,videoId
      * @return
      */
-    int deleteUserCollection(@Param("userId") Integer userId,@Param("videoId") Integer videoId);
+    int deleteUserCollection(@Param("userId") Integer userId, @Param("videoId") Integer videoId);
 
 }

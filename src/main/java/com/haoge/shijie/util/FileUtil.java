@@ -22,29 +22,9 @@ public class FileUtil {
     private final static String PREFIX_VIDEO = "video/";
     private final static String PREFIX_IMAGE = "image/";
     private final static String TITLE = "视界";
-    private final static String QUFENFU="userheadimg-";
+    private final static String QUFENFU = "userheadimg-";
     private Font font = new Font("微软雅黑", Font.PLAIN, 40);
     private Color color = new Color(255, 255, 255, 128);
-
-    /**
-     * 异步文件上传,如果是图片文件就添加水印
-     * @param file,filePath,fileName 文件字节,文件路径,文件名
-     */
-    @Async
-    public Future<String> uploadFile(byte[] file, String filePath, String fileName) throws Exception {
-        File targetFile = new File(filePath);
-        if (!targetFile.exists()) {
-            targetFile.mkdirs();
-        }
-        FileOutputStream out = new FileOutputStream(filePath + fileName);
-        out.write(file);
-        out.flush();
-        out.close();
-        if (isImgTypeByExt(fileName)&&!fileName.contains(QUFENFU)){
-            addWaterMark(filePath+fileName,filePath+fileName);
-        }
-        return new AsyncResult<String>("ok");
-    }
 
     /**
      * 根据文件类型转换成后缀名
@@ -61,25 +41,6 @@ public class FileUtil {
             e.printStackTrace();
         }
         return type.getExtension();
-    }
-
-    //判断文件是否是图片
-    public boolean isImgTypeByExt(String fileName) {
-        if (fileName == null) {
-            return false;
-        } else {
-            // 获取文件后缀名并转化为写，用于后续比较
-            String fileType = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
-            // 创建图片类型数组
-            String img[] = { "jpg", "jpeg", "png","bmp","tiff", "gif", "pcx", "tga", "exif", "fpx", "svg", "psd",
-                    "cdr", "pcd", "dxf", "ufo", "eps", "ai", "raw", "wmf"};
-            for (int i = 0; i < img.length; i++) {
-                if (img[i].equals(fileType)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -104,6 +65,78 @@ public class FileUtil {
     public static boolean isImageFile(String fileType) {
         if (StrJudgeUtil.isCorrectStr(fileType) && fileType.contains(PREFIX_IMAGE)) {
             return true;
+        }
+        return false;
+    }
+
+    private static int getFontWidth(Font font, String str) {
+        return sun.font.FontDesignMetrics.getMetrics(font).stringWidth(str) + 15;
+//高度
+//        System.out.println( fm.getHeight() );
+//单个字符宽度
+//        System.out.println( fm.charWidth( 'A' ));
+//整个字符串的宽度
+    }
+
+    private static int getFontHeigh(Font font) {
+        return sun.font.FontDesignMetrics.getMetrics(font).getHeight() - 30;
+    }
+
+    /**
+     * 获取视频时长，单位为秒
+     *
+     * @param videoPath 视频路径
+     * @return 时长（s）
+     */
+    public static int getVideoTime(String videoPath) {
+        Integer times = 0;
+        try {
+            FFmpegFrameGrabber ff = new FFmpegFrameGrabber(videoPath);
+            ff.start();
+            times = (int) ff.getLengthInTime() / (1000 * 1000);
+            ff.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return times;
+    }
+
+    /**
+     * 异步文件上传,如果是图片文件就添加水印
+     *
+     * @param file,filePath,fileName 文件字节,文件路径,文件名
+     */
+    @Async
+    public Future<String> uploadFile(byte[] file, String filePath, String fileName) throws Exception {
+        File targetFile = new File(filePath);
+        if (!targetFile.exists()) {
+            targetFile.mkdirs();
+        }
+        FileOutputStream out = new FileOutputStream(filePath + fileName);
+        out.write(file);
+        out.flush();
+        out.close();
+        if (isImgTypeByExt(fileName) && !fileName.contains(QUFENFU)) {
+            addWaterMark(filePath + fileName, filePath + fileName);
+        }
+        return new AsyncResult<String>("ok");
+    }
+
+    //判断文件是否是图片
+    public boolean isImgTypeByExt(String fileName) {
+        if (fileName == null) {
+            return false;
+        } else {
+            // 获取文件后缀名并转化为写，用于后续比较
+            String fileType = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
+            // 创建图片类型数组
+            String img[] = {"jpg", "jpeg", "png", "bmp", "tiff", "gif", "pcx", "tga", "exif", "fpx", "svg", "psd",
+                    "cdr", "pcd", "dxf", "ufo", "eps", "ai", "raw", "wmf"};
+            for (int i = 0; i < img.length; i++) {
+                if (img[i].equals(fileType)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -140,7 +173,6 @@ public class FileUtil {
         int oheight = srcBi.getHeight();
 
 
-
         // 对截取的帧进行等比例缩放
         int width = 800;
         int height = (int) (((double) width / owidth) * oheight);
@@ -163,44 +195,13 @@ public class FileUtil {
         ff.stop();
     }
 
-    private static int getFontWidth(Font font, String str) {
-        return sun.font.FontDesignMetrics.getMetrics(font).stringWidth(str) + 15;
-//高度
-//        System.out.println( fm.getHeight() );
-//单个字符宽度
-//        System.out.println( fm.charWidth( 'A' ));
-//整个字符串的宽度
-    }
-
-    private static int getFontHeigh(Font font) {
-        return sun.font.FontDesignMetrics.getMetrics(font).getHeight() - 30;
-    }
-
-    /**
-     * 获取视频时长，单位为秒
-     *
-     * @param videoPath 视频路径
-     * @return 时长（s）
-     */
-    public static int getVideoTime(String videoPath) {
-        Integer times = 0;
-        try {
-            FFmpegFrameGrabber ff = new FFmpegFrameGrabber(videoPath);
-            ff.start();
-            times = (int) ff.getLengthInTime() / (1000 * 1000);
-            ff.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return times;
-    }
-
     /**
      * 图片添加水印
+     *
      * @param srcImgPath 源图片路径
      * @param tarImgPath 保存的图片路径
      */
-   // @Async
+    // @Async
     public void addWaterMark(String srcImgPath, String tarImgPath) {
         try {
             // 读取原图片信息

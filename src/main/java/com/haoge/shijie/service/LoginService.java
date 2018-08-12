@@ -7,12 +7,15 @@ public interface LoginService {
 
     /**
      * 根据用户账号查询区域
+     *
      * @param userName
      * @return
      */
-    ResponseBean findToken(String userName, String userPassword);
+    ResponseBean getToken(String userName, String userPassword);
+
     /**
      * 根据用户账号密码查询区域
+     *
      * @param userName,passWord
      * @return
      */

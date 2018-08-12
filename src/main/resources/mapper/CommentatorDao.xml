@@ -12,7 +12,7 @@
             3: 映射文件的parameterType必须等于接口方法的参数类型
             4: 映射文件resultType必须等于接口方法的返回类型
      -->
-<!--sql多个查询-->
+    <!--sql多个查询-->
     <select id="queryCommentatorList" resultType="com.haoge.shijie.pojo.CommentatorBean">
         SELECT
           *
@@ -48,27 +48,27 @@
        t.to_video_id=#{toVideoId} AND t.to_user_id=#{toUserId}
     </select>
     <insert id="insertCommentator" useGeneratedKeys="true" keyProperty="txtId"
-            keyColumn="txt_id" parameterType="com.haoge.shijie.pojo.CommentatorBean" >
+            keyColumn="txt_id" parameterType="com.haoge.shijie.pojo.CommentatorBean">
         INSERT INTO
         Tb_commentator
         (user_id,to_user_id,to_video_id,txt_context,commentator_tip_num,commentator_trample_num,txt_creat_time)
         VALUES
         (#{userId},#{toUserId},#{toVideoId},#{txtContext},#{commentatorTipNum},#{commentatorTrampleNum},#{txtCreatTime})
     </insert>
-    <update id="updateCommentator" parameterType="com.haoge.shijie.pojo.CommentatorBean" >
-    UPDATE  Tb_commentator
-    <set>
-        <if test="userId!=null">user_id=#{userId},</if>
-        to_user_id=#{toUserId},
-        <if test="to_video_id!=null">to_video_id=#{toVideoId},</if>
-        txt_context=#{txtContext},
-        commentator_tip_num=#{commentatorTipNum},
-        commentator_trample_num=#{commentatorTrampleNum},
-        txt_creat_time=#{txtCreatTime},
-    </set>
-    WHERE txt_id=#{txtId}
-   </update>
-    <update id="updateCommTopAdd" >
+    <update id="updateCommentator" parameterType="com.haoge.shijie.pojo.CommentatorBean">
+        UPDATE Tb_commentator
+        <set>
+            <if test="userId!=null">user_id=#{userId},</if>
+            to_user_id=#{toUserId},
+            <if test="to_video_id!=null">to_video_id=#{toVideoId},</if>
+            txt_context=#{txtContext},
+            commentator_tip_num=#{commentatorTipNum},
+            commentator_trample_num=#{commentatorTrampleNum},
+            txt_creat_time=#{txtCreatTime},
+        </set>
+        WHERE txt_id=#{txtId}
+    </update>
+    <update id="updateCommTopAdd">
         UPDATE
         Tb_commentator
         SET

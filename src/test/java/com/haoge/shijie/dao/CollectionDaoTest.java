@@ -1,6 +1,5 @@
 package com.haoge.shijie.dao;
 
-import com.haoge.shijie.pojo.CollectionBean;
 import com.haoge.shijie.pojo.VideoBean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +19,8 @@ public class CollectionDaoTest {
 
     @Test
     public void queryCollectionList() {
-        List<VideoBean> collectionBeanList=collectionDao.queryCollectionByUid(1);
-        for(VideoBean collectionBean:collectionBeanList){
+        List<VideoBean> collectionBeanList = collectionDao.queryCollectionByUid(1);
+        for (VideoBean collectionBean : collectionBeanList) {
             //System.out.println("发布视频者id"+collectionBean.getVideoBean().getUserId()+"收藏者:"+collectionBean.getUserId());
         }
     }

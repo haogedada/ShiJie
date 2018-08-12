@@ -4,13 +4,13 @@ import java.sql.Timestamp;
 
 public class CommentatorBean {
 
-    private Integer txtId,userId,toUserId,toVideoId,
-            commentatorTipNum,commentatorTrampleNum;
+    private Integer txtId, userId, toUserId, toVideoId,
+            commentatorTipNum, commentatorTrampleNum;
     private String txtContext;
     private Timestamp txtCreatTime;
 
 
-    public CommentatorBean(){
+    public CommentatorBean() {
 
     }
 

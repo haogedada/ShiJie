@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,14 +40,14 @@
         </dependency>
         <!--mysql-->
         <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <!--线程池-->
         <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>c3p0</artifactId>
-        <version>0.9.5.2</version>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
         </dependency>
         <!--shiro 安全框架-->
         <dependency>
@@ -87,7 +87,7 @@
             <!-- provided表明该包只在编译和测试的时候用 发布到tomcat上是要注释掉-->
             <scope>provided</scope>
         </dependency>
-       <!--邮箱相关依赖-->
+        <!--邮箱相关依赖-->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>

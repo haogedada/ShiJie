@@ -1,13 +1,14 @@
 package com.haoge.shijie.pojo;
 
 public class AuxiliaryUserBean {
-     private Integer Id,userId;
-     private String userRole,userCode,userPermission,userToken,code;
-     public AuxiliaryUserBean(){
+    private Integer Id, userId;
+    private String userRole, userCode, userPermission, userToken, code;
 
-     }
+    public AuxiliaryUserBean() {
 
-    public AuxiliaryUserBean(Integer userId, String userRole, String userCode, String userPermission, String userToken,String code) {
+    }
+
+    public AuxiliaryUserBean(Integer userId, String userRole, String userCode, String userPermission, String userToken, String code) {
         this.userId = userId;
         this.userRole = userRole;
         this.userCode = userCode;

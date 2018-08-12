@@ -13,7 +13,7 @@ public class WebController {
 //    public void setService(UserService userService) {
 //        this.userService = userService;
 //    }
-        //登入
+    //登入
 //    @PostMapping("/login")
 //    public ResponseBean login(@RequestParam("username") String username,
 //                              @RequestParam("password") String password) {
@@ -28,10 +28,10 @@ public class WebController {
 //    public ResponseBean article() {
 //        Subject subject = SecurityUtils.getSubject();
 //        if (subject.isAuthenticated()) {//判断是游客还是用户
-          //用户
+    //用户
 //            return new ResponseBean(200, "You are already logged in", null);
 //        } else {
-          //游客
+    //游客
 //            return new ResponseBean(200, "You are guest", null);
 //        }
 //    }

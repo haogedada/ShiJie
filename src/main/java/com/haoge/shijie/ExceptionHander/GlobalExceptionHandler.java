@@ -1,10 +1,8 @@
 package com.haoge.shijie.ExceptionHander;
 
 
-
-import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.response.ResponseBean;
-import com.haoge.shijie.service.UserService;
+import com.haoge.shijie.service.VideoService;
 import org.apache.shiro.ShiroException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-
-
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -26,10 +22,21 @@ import javax.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
     @Autowired
-    private UserService userService;
+    private VideoService videoService;
 
     // Log4j日志处理(@author: rico)
     //private static final Logger log = Logger.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 判断是否是ajax请求
+     *
+     * @param httpServletRequest
+     * @return boolean is ajax
+     */
+    public static boolean isAjax(HttpServletRequest httpServletRequest) {
+        return (httpServletRequest.getHeader("X-Requested-With") != null &&
+                "XMLHttpRequest".equals(httpServletRequest.getHeader("X-Requested-With").toString()));
+    }
 
     /**
      * 400 - Bad Request
@@ -43,6 +50,7 @@ public class GlobalExceptionHandler {
         // return new response().failure("无法读取JSON");
         return new ResponseBean(431, "unable to read JSON", null);
     }
+
     /**
      * 400 - Bad Request
      */
@@ -55,6 +63,7 @@ public class GlobalExceptionHandler {
         System.out.println("参数验证异常");
         return new ResponseBean(400, "parameter validation exception", null);
     }
+
     /**
      * 405 - Method Not Allowed。HttpRequestMethodNotSupportedException
      * 是ServletException的子类,需要Servlet API支持
@@ -76,7 +85,8 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
-    public @ResponseBody ResponseBean handleHttpMediaTypeNotSupportedException(Exception e) {
+    public @ResponseBody
+    ResponseBean handleHttpMediaTypeNotSupportedException(Exception e) {
         //   return new response().failure("不支持内容类型");
         return new ResponseBean(415, "content type not supported", null);
     }
@@ -84,30 +94,35 @@ public class GlobalExceptionHandler {
     // 捕捉shiro的异常
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(ShiroException.class)
-    public @ResponseBody ResponseBean handle401(ShiroException e) {
+    public @ResponseBody
+    ResponseBean handle401(ShiroException e) {
         return new ResponseBean(401, e.getMessage(), null);
     }
+
+    // 捕捉其他所有异常
+
     // 捕捉UnauthorizedException
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
-    public @ResponseBody ResponseBean handle401(UnauthorizedException e) {
+    public @ResponseBody
+    ResponseBean handle401(UnauthorizedException e) {
         //权限不足异常
         return new ResponseBean(401, "Unauthorized", null);
     }
 
-    // 捕捉其他所有异常
     /**
      * 500 - Internal Server Error
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ResponseBean globalException(HttpServletRequest request, Exception ex)  {
-       if(ex.getMessage().equals("Required request part 'coverfile' is not present")){
-          boolean success= userService.modifyVideo(request);
-          if (success){
-              return new ResponseBean().successMethod();
-          }
-       }
+    public @ResponseBody
+    ResponseBean globalException(HttpServletRequest request, Exception ex) {
+        if (ex.getMessage().equals("Required request part 'coverfile' is not present")) {
+            boolean success = videoService.modifyVideo(request);
+            if (success) {
+                return new ResponseBean().successMethod();
+            }
+        }
         return new ResponseBean().failMethod(getStatus(request).value(), ex.getMessage());
     }
 
@@ -117,14 +132,5 @@ public class GlobalExceptionHandler {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
         return HttpStatus.valueOf(statusCode);
-    }
-    /**
-     * 判断是否是ajax请求
-     * @param httpServletRequest
-     * @return boolean is ajax
-     */
-    public static boolean isAjax(HttpServletRequest httpServletRequest){
-        return (httpServletRequest.getHeader("X-Requested-With")!=null &&
-                "XMLHttpRequest".equals(httpServletRequest.getHeader("X-Requested-With").toString()));
     }
 }

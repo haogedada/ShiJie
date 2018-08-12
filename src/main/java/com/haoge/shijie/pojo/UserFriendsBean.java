@@ -1,16 +1,17 @@
 package com.haoge.shijie.pojo;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 public class UserFriendsBean {
-    private Integer id,userId,friendId;
+    private Integer id, userId, friendId;
     private Timestamp creatTime;
     private String friendType;
     private UserBean user;
-    public UserFriendsBean(){
+
+    public UserFriendsBean() {
 
     }
+
     public UserFriendsBean(Integer id, Integer userId,
                            Integer friendId, Timestamp creatTime, String friendType) {
         this.id = id;

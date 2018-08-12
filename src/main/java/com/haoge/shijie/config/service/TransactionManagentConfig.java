@@ -15,6 +15,7 @@ public class TransactionManagentConfig implements TransactionManagementConfigure
 
     @Autowired
     private DataSource dataSource;
+
     @Override
     public PlatformTransactionManager annotationDrivenTransactionManager() {
 

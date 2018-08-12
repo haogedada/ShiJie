@@ -1,12 +1,9 @@
 package com.haoge.shijie.Interceptor;
 
-import com.haoge.shijie.util.JWTUtil;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Date;
 
 @WebFilter(filterName = "MyFilter", urlPatterns = "/upLoadFile/*")
 public class MyFilter implements Filter {
@@ -14,11 +11,12 @@ public class MyFilter implements Filter {
     public void init(FilterConfig arg0) throws ServletException {
         //System.out.println("MyFilter init............");
     }
+
     //过滤器
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        //System.out.println("MyFilter doFilter.........before");
+        //       System.out.println("MyFilter doFilter.........before");
 //        if(isLoginAttempt(request,response)) {
 //            HttpServletRequest req = (HttpServletRequest) request;
 //            String token = req.getHeader("Authorization");
@@ -39,6 +37,7 @@ public class MyFilter implements Filter {
 //        }
         chain.doFilter(request, response);
     }
+
     @Override
     public void destroy() {
         //System.out.println("MyFilter destroy..........");

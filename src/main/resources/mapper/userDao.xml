@@ -12,7 +12,7 @@
             3: 映射文件的parameterType必须等于接口方法的参数类型
             4: 映射文件resultType必须等于接口方法的返回类型
      -->
-<!--sql多个查询-->
+    <!--sql多个查询-->
     <!--关联实体映射关系-->
     <resultMap type="com.haoge.shijie.pojo.UserBean" id="userResultMap">
         <!--代表本体类-->
@@ -28,25 +28,25 @@
         <result property="userEmail" column="user_email"/>
         <result property="headimgUrl" column="headimg_url"/>
         <!--association 表示一对一的关联关系，property指定实体对象名字-->
-       <association property="auxiliaryUserBean" javaType="com.haoge.shijie.pojo.AuxiliaryUserBean">
-         <id property="Id" column="id"/>
-         <result property="userId" column="user_id"/>
-           <result property="userRole" column="user_role"/>
-           <result property="userCode" column="user_code"/>
-           <result property="userPermission" column="user_permission"/>
-           <result property="userToken" column="user_token"/>
-           </association>
+        <association property="auxiliaryUserBean" javaType="com.haoge.shijie.pojo.AuxiliaryUserBean">
+            <id property="Id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="userRole" column="user_role"/>
+            <result property="userCode" column="user_code"/>
+            <result property="userPermission" column="user_permission"/>
+            <result property="userToken" column="user_token"/>
+        </association>
         <!-- collection 表示集合，ofType指定集合中的对象类型 -->
         <collection property="videoBeans" ofType="com.haoge.shijie.pojo.VideoBean">
-           <id property="videoId" column="video_id"/>
-           <result property="userId" column="user_id"/>
+            <id property="videoId" column="video_id"/>
+            <result property="userId" column="user_id"/>
             <result property="videoTitle" column="video_title"/>
             <result property="playerCount" column="player_count"/>
             <result property="videoTipNum" column="video_tip_num"/>
             <result property="videoTrampleNum" column="video_trample_num"/>
             <result property="videoUrl" column="video_url"/>
             <result property="videoCreatTime" column="video_creat_time"/>
-         </collection>
+        </collection>
         <collection property="userFriends" ofType="com.haoge.shijie.pojo.UserFriendsBean">
             <id property="id" column="id"/>
             <result property="userId" column="user_id"/>
@@ -61,14 +61,14 @@
             <result property="creatTime" column="creat_time"/>
         </collection>
 
-     </resultMap>
+    </resultMap>
     <select id="queryUserList" resultType="com.haoge.shijie.pojo.UserBean">
         SELECT
           *
         FROM
           Tb_user
     </select>
-    <select id="queryUserById" resultType="com.haoge.shijie.pojo.UserBean" >
+    <select id="queryUserById" resultType="com.haoge.shijie.pojo.UserBean">
         SELECT
         *
         FROM
@@ -116,15 +116,15 @@
         WHERE u.user_email=#{userEmail}
     </select>
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="userId"
-            keyColumn="user_id" parameterType="com.haoge.shijie.pojo.UserBean" >
+            keyColumn="user_id" parameterType="com.haoge.shijie.pojo.UserBean">
         INSERT INTO
         Tb_user(user_name,user_password,user_nickname,user_sex,user_birthday,bardian_sign,
         headimg_url,register_time,user_email)
         VALUES(#{userName},#{userPassword},#{userNickname},#{userSex},#{userBirthday},#{bardianSign},
         #{headimgUrl},#{registerTime},#{userEmail})
     </insert>
-    <update id="updateUser" parameterType="com.haoge.shijie.pojo.UserBean" >
-        UPDATE  Tb_user
+    <update id="updateUser" parameterType="com.haoge.shijie.pojo.UserBean">
+        UPDATE Tb_user
         <set>
             <if test="userName!=null">user_name=#{userName},</if>
             <if test="userPassword!=null">user_password=#{userPassword},</if>

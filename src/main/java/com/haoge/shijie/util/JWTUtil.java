@@ -12,11 +12,12 @@ import java.util.Date;
 
 public class JWTUtil {
     // 过期时间2小时
-    private static final long EXPIRE_TIME = 120*60*1000;
+    private static final long EXPIRE_TIME = 120 * 60 * 1000;
 
     /**
      * 校验token是否正确
-     * @param token 密钥
+     *
+     * @param token  密钥
      * @param secret 用户的密码
      * @return 是否正确
      */
@@ -35,6 +36,7 @@ public class JWTUtil {
 
     /**
      * 获得token中的信息无需secret解密也能获得
+     *
      * @return token中包含的用户名
      */
     public static String getUsername(String token) {
@@ -45,8 +47,10 @@ public class JWTUtil {
             return null;
         }
     }
+
     /**
      * 获得token中的时间信息
+     *
      * @return token中包含的时间
      */
     public static Date getTokenDate(String token) {
@@ -57,16 +61,18 @@ public class JWTUtil {
             return null;
         }
     }
+
     /**
      * 生成token值,通过用户的密码作为密钥
      * 生成签名,5min后过期
-     * @param username 用户名
+     *
+     * @param username  用户名
      * @param passoword 用户的密码
      * @return 加密的token
      */
     public static String sign(String username, String passoword) {
         try {
-            Date date = new Date(System.currentTimeMillis()+EXPIRE_TIME);
+            Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
             Algorithm algorithm = Algorithm.HMAC256(passoword);
             // 附带username信息
             return JWT.create()

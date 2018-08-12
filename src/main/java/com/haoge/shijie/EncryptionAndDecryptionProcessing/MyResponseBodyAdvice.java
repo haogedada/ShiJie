@@ -13,17 +13,18 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jeff on 15/10/23.
+ *
  * @SerializedField()，加密字符注解
- * @SerializedField(includes={"success","message","data"})只加密value不加密key值
- * 不加密，但如果参数不对没写的参数或错误的不会显示
- *  @SerializedField(includes={"code","message","data"},encode = false)
- *
+ * @SerializedField(includes={"success","message","data"})只加密value不加密key值 不加密，但如果参数不对没写的参数或错误的不会显示
+ * @SerializedField(includes={"code","message","data"},encode = false)
  * @SerializedField(excludes={"success","message","data"})去除key不显示，并加密value,同时显示value的明文和加密
- *
  */
 @Order(1)
 //@SuppressWarnings("unchecked")
@@ -49,32 +50,32 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
         //重新初始化为默认值
         includes = new String[]{};
         excludes = new String[]{};
-        encryptions=new String[]{};
+        encryptions = new String[]{};
         encode = true;
         //判断返回的对象是单个对象，还是list，还是map
-        if(o==null){
+        if (o == null) {
             return null;
         }
-        if(methodParameter.getMethod().isAnnotationPresent(SerializedField.class)){
+        if (methodParameter.getMethod().isAnnotationPresent(SerializedField.class)) {
             //获取注解配置的包含,去除字段,加密字段
             SerializedField serializedField = methodParameter.getMethodAnnotation(SerializedField.class);
             includes = serializedField.includes();
             excludes = serializedField.excludes();
-            encryptions=serializedField.encryptions();
-                    //是否加密
+            encryptions = serializedField.encryptions();
+            //是否加密
             encode = serializedField.encode();
         }
 
         Object retObj = null;
-        if (o instanceof List){
+        if (o instanceof List) {
             //List
-            List list = (List)o;
+            List list = (List) o;
 
-                retObj = handleList(list);
+            retObj = handleList(list);
 
-        }else{
+        } else {
             //Single Object
-                retObj = handleSingleObject(o);
+            retObj = handleSingleObject(o);
 
         }
 
@@ -87,34 +88,34 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
      * @param o
      * @return
      */
-    private Object handleSingleObject(Object o)  {
-        Map<String,Object> map = new HashMap<String, Object>();
+    private Object handleSingleObject(Object o) {
+        Map<String, Object> map = new HashMap<String, Object>();
         Field[] fields = o.getClass().getDeclaredFields();
-        for (Field field:fields){
+        for (Field field : fields) {
             //如果未配置表示全部的都返回
-            if(includes.length==0 && excludes.length==0){
+            if (includes.length == 0 && excludes.length == 0) {
                 Object newVal = getNewVal(o, field);
                 map.put(field.getName(), newVal);
-            }else if(includes.length>0){
+            } else if (includes.length > 0) {
                 //有限考虑包含字段
-                if(CryptoHelper.isStringInArray(field.getName(), includes)){
-                        if(CryptoHelper.isStringInArray(field.getName(),encryptions)){
-                            String newVal =(String)getNewVal(o, field);
-                            map.put(field.getName(),newVal);
-                        }else{
-                            field.setAccessible(true);
-                            try {
-                                    Object val=field.get(o);
-                                    map.put(field.getName(),val);
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
+                if (CryptoHelper.isStringInArray(field.getName(), includes)) {
+                    if (CryptoHelper.isStringInArray(field.getName(), encryptions)) {
+                        String newVal = (String) getNewVal(o, field);
+                        map.put(field.getName(), newVal);
+                    } else {
+                        field.setAccessible(true);
+                        try {
+                            Object val = field.get(o);
+                            map.put(field.getName(), val);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
                         }
+                    }
                 }
-            }else{
+            } else {
                 //去除字段
-                if(excludes.length>0){
-                    if(!CryptoHelper.isStringInArray(field.getName(), excludes)){
+                if (excludes.length > 0) {
+                    if (!CryptoHelper.isStringInArray(field.getName(), excludes)) {
                         Object newVal = getNewVal(o, field);
                         map.put(field.getName(), newVal);
                     }
@@ -133,7 +134,7 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
      */
     private List handleList(List list) {
         List retList = new ArrayList();
-        for (Object o:list){
+        for (Object o : list) {
             Map map = (Map) handleSingleObject(o);
             retList.add(map);
         }
@@ -147,17 +148,17 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
      * @param field
      * @return
      */
-    private Object getNewVal(Object o, Field field){
-        Object newVal=null;
+    private Object getNewVal(Object o, Field field) {
+        Object newVal = null;
         try {
             field.setAccessible(true);
             Object val = field.get(o);
-            if(val!=null){
-                if(encode){
+            if (val != null) {
+                if (encode) {
                     //加密
                     newVal = CryptoHelper.encode(new Gson().toJson(val));
-                }else{
-                    newVal =new Gson().toJson(val);
+                } else {
+                    newVal = new Gson().toJson(val);
 
                 }
             }
@@ -169,10 +170,10 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
         return newVal;
     }
 
-    private String strCheck(String str){
+    private String strCheck(String str) {
         StringBuilder sb = new StringBuilder(str);
         sb.replace(0, 1, "");
-        sb.replace(sb.length()-1, sb.length(), "");
+        sb.replace(sb.length() - 1, sb.length(), "");
         return sb.toString();
     }
 }
