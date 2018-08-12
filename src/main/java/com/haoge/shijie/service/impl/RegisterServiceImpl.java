@@ -1,5 +1,6 @@
 package com.haoge.shijie.service.impl;
 
+import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.dao.AuxiliaryUserDao;
 import com.haoge.shijie.dao.UserDao;
 import com.haoge.shijie.pojo.AuxiliaryUserBean;
@@ -10,6 +11,8 @@ import com.haoge.shijie.util.MailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.haoge.shijie.constant.Constants.mailType.CODE;
 
 @Service
 public class RegisterServiceImpl implements RegisterService {
@@ -63,7 +66,7 @@ public class RegisterServiceImpl implements RegisterService {
             try {
                 int res = auxiliaryUserDao.updateAuxiliaryUser(auxiliaryUserBean);
                 if (res > 0) {
-                    String mailType = "verificationCode";
+                    String mailType =CODE.getName();
                     new Thread(new MailUtil(email, code, mailType)).start();
                     return true;
                 } else {

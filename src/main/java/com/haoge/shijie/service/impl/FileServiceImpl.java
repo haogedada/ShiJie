@@ -3,6 +3,8 @@ package com.haoge.shijie.service.impl;
 import com.haoge.shijie.service.FileService;
 import com.haoge.shijie.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class VideoController {
 
-    private final String UPLOADPATH = "/upLoadFile/";
-
     @Autowired
     private VideoService videoService;
+
+    private final String UPLOADPATH = "/upLoadFile/";
 
     //视频上传
     @PostMapping("/user/video")
@@ -40,15 +40,15 @@ public class VideoController {
     }
 
     //获取视频
-    @GetMapping("/user/video")
+    @GetMapping("/user/video/{videoId}")
     @SerializedField(includes = {"code", "msg", "data"})
-    public ResponseBean getVideo(@RequestParam("videoId") Integer videoId) {
+    public ResponseBean getVideo(@PathVariable("videoId") Integer videoId) {
         VideoBean videoBean = videoService.findVideo(videoId);
         return new ResponseBean().successMethod(videoBean);
     }
-
     //删除视频
     @DeleteMapping("/user/video")
+    @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean delVideo(@RequestHeader("Authorization") String token,
                                  @RequestParam("videoId") Integer videoId
@@ -60,9 +60,9 @@ public class VideoController {
             return new ResponseBean().failMethod(500, "删除失败");
         }
     }
-
     //修改视频
     @PutMapping("/user/video")
+    @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean modifyVideo(@RequestHeader("Authorization") String token,
                                     @RequestParam("videoId") Integer videoId,
@@ -81,6 +81,5 @@ public class VideoController {
         } else {
             return new ResponseBean().failMethod(500, "修改失败");
         }
-
     }
 }

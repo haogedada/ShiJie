@@ -1,5 +1,6 @@
 package com.haoge.shijie.service.impl;
 
+import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.dao.*;
 import com.haoge.shijie.pojo.AuxiliaryUserBean;
 import com.haoge.shijie.pojo.UserBean;
@@ -15,16 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.haoge.shijie.constant.Constants.mailType.ACTIVATION;
+import static com.haoge.shijie.constant.Constants.pathType.HEADPATH;
+import static com.haoge.shijie.constant.Constants.prefixType.HEADIMGPREFIX;
+import static com.haoge.shijie.constant.Constants.roleType.USERROLE;
+import static com.haoge.shijie.constant.Constants.urlType.HEADURL;
+
 @Service
 public class UserServiceImpl implements UserService {
-    private final static String S = java.io.File.separator;
-    private final static String FANS = "fans";
-    private final static String FOLLOW = "follow";
-    private final static String HEADURL = "http://www.haogedada.top/api/upLoadFile/headImage/";
-    private final static String HEADPATH = "headImage" + S;
-    private final static String HEADIMGPREFIX = "userheadimg-";
-    private final static String USERROLE = "user", MAILTYPEACT = "activation";
-
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -123,7 +122,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserBean findUserAndFriendById(Integer userId, String friendType) {
         if (StrJudgeUtil.isCorrectInt(userId) &&
-                (friendType.equals(FANS) || friendType.equals(FOLLOW))) {
+                (friendType.equals(Constants.friendType.FANS.getName()) || friendType.equals(Constants.friendType.FOLLOW.getName()))) {
             UserBean userBean = userDao.queryUserAndFriendById(userId, friendType);
             if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
                 return userBean;
@@ -164,8 +163,8 @@ public class UserServiceImpl implements UserService {
     public UserHomeBean goUserHomeByToken(String token) {
         UserHomeBean userHome = new UserHomeBean();
         UserBean userBean = findUserByToken(token);
-        int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), FANS).size();
-        int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), FOLLOW).size();
+        int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FANS.getName()).size();
+        int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName()).size();
         List<VideoBean> videos = videoDao.queryVideosByUid(userBean.getUserId());
         userHome.setNickName(userBean.getUserNickname());
         userHome.setHeardUrl(userBean.getHeadimgUrl());
@@ -226,13 +225,13 @@ public class UserServiceImpl implements UserService {
                             UserBean user = userDao.queryUserByName(userName);
                             AuxiliaryUserBean auxiliaryUserBean = new AuxiliaryUserBean();
                             auxiliaryUserBean.setUserId(user.getUserId());
-                            auxiliaryUserBean.setUserRole(USERROLE);
+                            auxiliaryUserBean.setUserRole(USERROLE.getName());
                             auxiliaryUserBean.setUserCode(code);
                             auxiliaryUserBean.setCode(dataCode);
                             try {
                                 int ares = auxiliaryUserDao.insertAuxiliaryUser(auxiliaryUserBean);
                                 if (ares > 0) {
-                                    String mailType = MAILTYPEACT;
+                                    String mailType =ACTIVATION.getName();
                                     new Thread(new MailUtil(email, code, mailType)).start();
                                     return true;
                                 } else {
@@ -276,15 +275,15 @@ public class UserServiceImpl implements UserService {
                 StrJudgeUtil.isCorrectStr(userBean.getUserBirthday())) {
             String fileType = file.getContentType();
             MultipartFile[] files = new MultipartFile[]{file};
-            String[] filesPath = new String[]{filePath + HEADPATH};
+            String[] filesPath = new String[]{filePath + HEADPATH.getName()};
             String[] filesName = null;
             if (FileUtil.isImageFile(fileType)) {
                 String ext = FileUtil.fileTypeConvert(fileType);
                 UserBean userBean1 = findUserByToken(token);
-                String fileName = HEADIMGPREFIX + userBean1.getUserId() + ext;
+                String fileName = HEADIMGPREFIX.getName() + userBean1.getUserId() + ext;
                 filesName = new String[]{fileName};
                 userBean1.setUserNickname(userBean.getUserNickname());
-                userBean1.setHeadimgUrl(HEADURL + fileName);
+                userBean1.setHeadimgUrl(HEADURL.getName() + fileName);
                 userBean1.setUserSex(userBean.getUserSex());
                 userBean1.setBardianSign(userBean.getBardianSign());
                 userBean1.setUserBirthday(userBean.getUserBirthday());
@@ -364,8 +363,8 @@ public class UserServiceImpl implements UserService {
     public UserHomeBean goUserHomeByUid(Integer userId) {
         UserHomeBean userHome = new UserHomeBean();
         UserBean userBean = userDao.queryUserById(userId);
-        int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), FANS).size();
-        int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), FOLLOW).size();
+        int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FANS.getName()).size();
+        int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName()).size();
         List<VideoBean> videos = videoDao.queryVideosByUid(userBean.getUserId());
         userHome.setNickName(userBean.getUserNickname());
         userHome.setHeardUrl(userBean.getHeadimgUrl());

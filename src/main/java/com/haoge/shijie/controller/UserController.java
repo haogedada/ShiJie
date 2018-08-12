@@ -1,6 +1,7 @@
 package com.haoge.shijie.controller;
 
 import com.haoge.shijie.annotation.SerializedField;
+import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.UserHomeBean;
@@ -17,8 +18,6 @@ import java.util.List;
 
 @RestController
 public class UserController {
-    private final static String FANS = "fans";
-    private final static String FOLLOW = "follow";
     private final static String UPLOADPATH = "/upLoadFile/";
     @Autowired
     private UserService userService;
@@ -87,7 +86,7 @@ public class UserController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean backFollowList(@RequestHeader("Authorization") String token) {
-        List<UserBean> followList = userService.goFriendList(token, FOLLOW);
+        List<UserBean> followList = userService.goFriendList(token, Constants.friendType.FOLLOW.getName());
         return new ResponseBean().successMethod(followList);
     }
 
@@ -96,7 +95,7 @@ public class UserController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean backFansList(@RequestHeader("Authorization") String token) {
-        List<UserBean> fansList = userService.goFriendList(token, FANS);
+        List<UserBean> fansList = userService.goFriendList(token, Constants.friendType.FOLLOW.getName());
         return new ResponseBean().successMethod(fansList);
     }
 

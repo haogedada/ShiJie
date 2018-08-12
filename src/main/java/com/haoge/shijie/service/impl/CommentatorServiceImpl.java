@@ -24,11 +24,20 @@ public class CommentatorServiceImpl implements CommentatorService {
     private VideoDao videoDao;
 
 
+    /**
+     * 查找所有评论
+     * @return
+     */
     @Override
     public List<CommentatorBean> findCommentatorList() {
         return commentatorDao.queryCommentatorList();
     }
 
+    /**
+     * 查找视频的评论
+     * @param toVideoId
+     * @return
+     */
     @Override
     public List<CommentatorBean> findCommByVdoIds(Integer toVideoId) {
         if (toVideoId == null || toVideoId < 0) {
@@ -37,6 +46,12 @@ public class CommentatorServiceImpl implements CommentatorService {
         return commentatorDao.queryCommByVdoIds(toVideoId);
     }
 
+    /**
+     * 查找评论列表根据视频id和用户id
+     * @param toVideoId
+     * @param toUserId
+     * @return
+     */
     @Override
     public List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toUserId) {
         if (toVideoId == null || toVideoId < 0) {
@@ -45,6 +60,11 @@ public class CommentatorServiceImpl implements CommentatorService {
         return commentatorDao.queryByVdoIdAndTuds(toVideoId, toUserId);
     }
 
+    /**
+     * 查找评论根据视频id
+     * @param toVideoId
+     * @return
+     */
     @Override
     public int findCountByVdoId(Integer toVideoId) {
         if (toVideoId == null || toVideoId < 0) {
@@ -53,6 +73,11 @@ public class CommentatorServiceImpl implements CommentatorService {
         return commentatorDao.queryCountByVdoId(toVideoId);
     }
 
+    /**
+     * 查找评论根据用户id
+     * @param toUserId
+     * @return
+     */
     @Override
     public int findCountByUserId(Integer toUserId) {
         if (toUserId == null || toUserId < 0) {
@@ -81,6 +106,13 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 添加视频评论
+     * @param toVideoId,token,content
+     * @param token
+     * @param content
+     * @return
+     */
     @Override
     @Transactional
     public boolean addVideoCommentator(Integer toVideoId, String token, String content) {
@@ -111,6 +143,14 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 添加评论者的评论
+     * @param toVideoId,toUserId,token,content
+     * @param toUserId
+     * @param token
+     * @param content
+     * @return
+     */
     @Override
     @Transactional
     public boolean addUserCommentator(Integer toVideoId, Integer toUserId, String token, String content) {
@@ -142,6 +182,11 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 修改评论
+     * @param commentator
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyCommentator(CommentatorBean commentator) {
@@ -162,6 +207,11 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 删除评论
+     * @param txtId
+     * @return
+     */
     @Override
     @Transactional
     public boolean delCommentator(Integer txtId) {
@@ -181,6 +231,12 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 视频顶一下
+     * @param VideoId
+     * @param token
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyVideoTop(Integer VideoId, String token) {
@@ -200,6 +256,12 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 视频踩一下
+     * @param VideoId
+     * @param token
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyVideoTrample(Integer VideoId, String token) {
@@ -219,6 +281,12 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 视频播放次数
+     * @param VideoId
+     * @param token
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyVideoPlayCount(Integer VideoId, String token) {
@@ -238,6 +306,12 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 评论顶一下
+     * @param txtId
+     * @param token
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyCommentTop(Integer txtId, String token) {
@@ -257,6 +331,12 @@ public class CommentatorServiceImpl implements CommentatorService {
         }
     }
 
+    /**
+     * 评论踩一下
+     * @param txtId
+     * @param token
+     * @return
+     */
     @Override
     @Transactional
     public boolean modifyCommentTrample(Integer txtId, String token) {

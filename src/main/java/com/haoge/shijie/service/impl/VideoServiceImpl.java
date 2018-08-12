@@ -1,6 +1,5 @@
 package com.haoge.shijie.service.impl;
 
-import com.haoge.shijie.dao.UserDao;
 import com.haoge.shijie.dao.VideoDao;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
@@ -9,7 +8,6 @@ import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.service.VideoService;
 import com.haoge.shijie.util.DateUtil;
 import com.haoge.shijie.util.FileUtil;
-import com.haoge.shijie.util.JWTUtil;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,18 +16,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.haoge.shijie.constant.Constants.pathType.VIDEOCOVERPATH;
+import static com.haoge.shijie.constant.Constants.pathType.VIDEOPATH;
+import static com.haoge.shijie.constant.Constants.prefixType.COVERIMGPREFIX;
+import static com.haoge.shijie.constant.Constants.prefixType.VIDEOPREFIX;
+import static com.haoge.shijie.constant.Constants.urlType.VIDEOCOVERURL;
+import static com.haoge.shijie.constant.Constants.urlType.VIDEOURL;
+
 @Service
 public class VideoServiceImpl implements VideoService {
 
-    private final static String S = java.io.File.separator;
-    private final String VIDEOURL = "http://www.haogedada.top/api/upLoadFile/videoFile/";
-    private final String VIDEOCOVERURL = "http://www.haogedada.top/api/upLoadFile/videoCover/";
-    private final String VIDEOPATH = "videoFile" + S;
-    private final String VIDEOCOVERPATH = "videoCover" + S;
-    private final String COVERIMGPREFIX = "videocover-", VIDEOPREFIX = "video";
 
-    @Autowired
-    private UserDao userDao;
     @Autowired
     private VideoDao videoDao;
     @Autowired
@@ -53,8 +50,7 @@ public class VideoServiceImpl implements VideoService {
         if (StrJudgeUtil.isCorrectInt(videoId) &&
                 StrJudgeUtil.isCorrectStr(title) &&
                 StrJudgeUtil.isCorrectStr(content)) {
-            String userName = JWTUtil.getUsername(token);
-            UserBean userBean = userDao.queryUserByName(userName);
+            UserBean userBean = userService.findUserByToken(token);
             VideoBean videoBean = videoDao.queryVideoByVid(videoId);
             if (userBean.getUserId() == videoBean.getUserId()) {
                 try {
@@ -101,7 +97,7 @@ public class VideoServiceImpl implements VideoService {
                 String[] coversName = null;
                 String imgType = coverFile.getContentType();
                 if (FileUtil.isImageFile(imgType)) {
-                    String coverName = COVERIMGPREFIX + videoBean1.getVideoId() + FileUtil.fileTypeConvert(imgType);
+                    String coverName = COVERIMGPREFIX.getName() + videoBean1.getVideoId() + FileUtil.fileTypeConvert(imgType);
                     coversName = new String[]{coverName};
                     try {
                         videoBean1.setVideoTitle(videoBean.getVideoTitle());
@@ -189,7 +185,7 @@ public class VideoServiceImpl implements VideoService {
     @Transactional
     public boolean addVideo(String title, String content, String token, MultipartFile[] file, String filePath) {
         String[] fileType = null;
-        String[] filesPath = new String[]{filePath + VIDEOPATH, filePath + VIDEOCOVERPATH};
+        String[] filesPath = new String[]{filePath + VIDEOPATH.getName(), filePath + VIDEOCOVERPATH.getName()};
         if (file.length == 1) {
             fileType = new String[]{file[0].getContentType()};
         } else if (file.length == 2) {
@@ -209,15 +205,15 @@ public class VideoServiceImpl implements VideoService {
             if (StrJudgeUtil.isCorrectInt(videoId)) {
                 //根据videoType获取文件后缀名
                 String videoext = FileUtil.fileTypeConvert(fileType[0]);
-                String videoName = VIDEOPREFIX + user.getUserId() + "-" + videoId + videoext;
+                String videoName = VIDEOPREFIX.getName() + user.getUserId() + "-" + videoId + videoext;
                 String coverName = null;
                 String[] filesName = null;
                 //判断用户是否上传封面，
                 if (file.length == 1 && fileType.length == 1) {
-                    coverName = COVERIMGPREFIX + videoId + ".jpg";
+                    coverName = COVERIMGPREFIX.getName() + videoId + ".jpg";
                 } else if (file.length == 2 && fileType.length == 2) {
                     String coverext = FileUtil.fileTypeConvert(fileType[1]);
-                    coverName = COVERIMGPREFIX + videoId + coverext;
+                    coverName = COVERIMGPREFIX.getName() + videoId + coverext;
                 }
                 filesName = new String[]{videoName, coverName};
                 try {
@@ -233,8 +229,8 @@ public class VideoServiceImpl implements VideoService {
                         videoBean.setPlayerCount(0);
                         videoBean.setVideoTipNum(0);
                         videoBean.setVideoTrampleNum(0);
-                        videoBean.setVideoUrl(VIDEOURL + videoName);
-                        videoBean.setVideoCoverUrl(VIDEOCOVERURL + coverName);
+                        videoBean.setVideoUrl(VIDEOURL.getName() + videoName);
+                        videoBean.setVideoCoverUrl(VIDEOCOVERURL.getName() + coverName);
                         videoBean.setVideoTime(videoTime);
                         int res = videoDao.insertVideo(videoBean);
                         if (res > 0) {
