@@ -35,22 +35,24 @@ public class MyInterceptor implements HandlerInterceptor {
         // System.out.println("---------------------开始进入请求地址拦截----------------------------");
         try {
             String token = request.getHeader("Authorization");
+            if (token==null||token.equals("")){
+                return true;
+            }
             // 解密获得date，用于和当前时间进行对比
             Date tokenTime = JWTUtil.getTokenDate(token);
             //token即将失效，提示前端自己重新获取一个新的token
-            if ((System.currentTimeMillis() - tokenTime.getTime() >= SHIXIAOTIME)) {
+            if (System.currentTimeMillis() - tokenTime.getTime() >= SHIXIAOTIME) {
                 String userName = JWTUtil.getUsername(token);
                 UserBean userBean = loginService.findUserByName(userName);
                 if (userBean != null && userBean.getUserName() != null) {
                     String newToken = JWTUtil.sign(userBean.getUserName(), userBean.getUserPassword());
                     response.addHeader("authorization", newToken);
                     return true;
-                } else {
+                }else {
                     return false;
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
         return true;
