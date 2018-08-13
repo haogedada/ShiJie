@@ -58,18 +58,18 @@ public interface CommentatorService {
     /**
      * 添加评论视频
      *
-     * @param toVideoId,token,content
+     * @param commentator,token
      * @return 是否成功
      */
-    boolean addVideoCommentator(Integer toVideoId, String token, String content);
+    boolean addVideoCommentator(CommentatorBean commentator, String token);
 
     /**
      * 添加评论用户的评论
      *
-     * @param toVideoId,toUserId,token,content
+     * @param commentator,token
      * @return 是否成功
      */
-    boolean addUserCommentator(Integer toVideoId, Integer toUserId, String token, String content);
+    boolean addUserCommentator(CommentatorBean commentator, String token);
 
 
     /**
@@ -88,32 +88,6 @@ public interface CommentatorService {
      */
     boolean delCommentator(Integer txtId);
 
-    /**
-     * 视频顶一下
-     *
-     * @param toVideoId
-     * @param token
-     * @return 是否成功
-     */
-    boolean modifyVideoTop(Integer toVideoId, String token);
-
-    /**
-     * 视频踩一下
-     *
-     * @param VideoId
-     * @param token
-     * @return 是否成功
-     */
-    boolean modifyVideoTrample(Integer VideoId, String token);
-
-    /**
-     * 视频播放量+1
-     *
-     * @param VideoId
-     * @param token
-     * @return 是否成功
-     */
-    boolean modifyVideoPlayCount(Integer VideoId, String token);
 
     /**
      * 评论顶一下

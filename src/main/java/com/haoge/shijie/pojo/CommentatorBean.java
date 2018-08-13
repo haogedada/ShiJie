@@ -3,12 +3,11 @@ package com.haoge.shijie.pojo;
 import java.sql.Timestamp;
 
 public class CommentatorBean {
-
     private Integer txtId, userId, toUserId, toVideoId,
             commentatorTipNum, commentatorTrampleNum;
     private String txtContext;
     private Timestamp txtCreatTime;
-
+    private UserBean userBean;
 
     public CommentatorBean() {
 
@@ -101,5 +100,13 @@ public class CommentatorBean {
 
     public void setTxtCreatTime(Timestamp txtCreatTime) {
         this.txtCreatTime = txtCreatTime;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 }

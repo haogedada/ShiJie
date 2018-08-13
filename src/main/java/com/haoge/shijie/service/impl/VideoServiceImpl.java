@@ -51,7 +51,7 @@ public class VideoServiceImpl implements VideoService {
                 StrJudgeUtil.isCorrectStr(title) &&
                 StrJudgeUtil.isCorrectStr(content)) {
             UserBean userBean = userService.findUserByToken(token);
-            VideoBean videoBean = videoDao.queryVideoByVid(videoId);
+            VideoBean videoBean = findVideoByVid(videoId);
             if (userBean.getUserId() == videoBean.getUserId()) {
                 try {
                     videoBean.setVideoTitle(title);
@@ -90,7 +90,7 @@ public class VideoServiceImpl implements VideoService {
                 StrJudgeUtil.isCorrectStr(videoBean.getVideoTitle()) &&
                 StrJudgeUtil.isCorrectStr(videoBean.getVideoContent())) {
             UserBean userBean = userService.findUserByToken(token);
-            VideoBean videoBean1 = videoDao.queryVideoByVid(videoBean.getVideoId());
+            VideoBean videoBean1 = findVideoByVid(videoBean.getVideoId());
             if (userBean.getUserId() == videoBean1.getUserId()) {
                 String[] coversPath = new String[]{filePath + VIDEOCOVERPATH};
                 MultipartFile[] coversFile = new MultipartFile[]{coverFile};
@@ -126,13 +126,13 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public VideoBean findVideo(Integer videoId) {
+    public VideoBean findVideoByVid(Integer videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             VideoBean videoBean = videoDao.queryVideoByVid(videoId);
-            if (videoBean != null) {
-                return videoBean;
-            } else {
+            if (videoBean == null) {
                 throw new RuntimeException("视频不存在");
+            } else {
+                return videoBean;
             }
         } else {
             throw new RuntimeException("参数不合法");
@@ -148,10 +148,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
-    public boolean delVideo(String token, Integer videoId) {
+    public boolean delVideoByVid(String token, Integer videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             UserBean userBean = userService.findUserByToken(token);
-            VideoBean videoBean = videoDao.queryVideoByVid(videoId);
+            VideoBean videoBean = findVideoByVid(videoId);
             if (videoBean.getUserId() == userBean.getUserId()) {
                 try {
                     int res = videoDao.deleteVideo(videoId);
@@ -248,5 +248,84 @@ public class VideoServiceImpl implements VideoService {
         }
         return false;
     }
+
+    /**
+     * 修改视频播放次数
+     *
+     * @param VideoId
+     * @param token
+     * @return
+     */
+    @Override
+    @Transactional
+    public boolean modifyVideoPlayCount(Integer VideoId, String token) {
+        if (StrJudgeUtil.isCorrectInt(VideoId)) {
+            try {
+                int res = videoDao.updatePlayCountAdd(VideoId);
+                if (res > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
+            throw new RuntimeException("修改播放量参数错误");
+        }
+    }
+
+    /**
+     * 视频顶一下
+     *
+     * @param VideoId
+     * @param token
+     * @return
+     */
+    @Override
+    @Transactional
+    public boolean modifyVideoTop(Integer VideoId, String token) {
+        if (StrJudgeUtil.isCorrectInt(VideoId)) {
+            try {
+                int res = videoDao.updateVdoTopAdd(VideoId);
+                if (res > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
+            throw new RuntimeException("顶一下视频参数错误");
+        }
+    }
+
+    /**
+     * 视频踩一下
+     *
+     * @param VideoId
+     * @param token
+     * @return
+     */
+    @Override
+    @Transactional
+    public boolean modifyVideoTrample(Integer VideoId, String token) {
+        if (StrJudgeUtil.isCorrectInt(VideoId)) {
+            try {
+                int res = videoDao.updateVdeoTraAdd(VideoId);
+                if (res > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
+            throw new RuntimeException("踩一下视频参数错误");
+        }
+    }
+
 
 }

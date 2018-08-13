@@ -1,6 +1,5 @@
 package com.haoge.shijie.service.impl;
 
-import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.dao.AuxiliaryUserDao;
 import com.haoge.shijie.dao.UserDao;
 import com.haoge.shijie.pojo.AuxiliaryUserBean;
@@ -66,7 +65,7 @@ public class RegisterServiceImpl implements RegisterService {
             try {
                 int res = auxiliaryUserDao.updateAuxiliaryUser(auxiliaryUserBean);
                 if (res > 0) {
-                    String mailType =CODE.getName();
+                    String mailType = CODE.getName();
                     new Thread(new MailUtil(email, code, mailType)).start();
                     return true;
                 } else {

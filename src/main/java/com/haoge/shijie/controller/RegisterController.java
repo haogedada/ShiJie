@@ -38,16 +38,13 @@ public class RegisterController {
     @GetMapping("/register/activation")
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean Activation(@RequestParam("code") String code, HttpServletResponse response) throws Exception {
-        int success = Service.activationUser(code);
-        if (success == 0) {
-            return new ResponseBean().successMethod("激活码失效，请重新注册");
-        } else if (success == 1) {
+        boolean success = Service.activationUser(code);
+        if (success) {
             //response.sendRedirect("/login.html");
             return new ResponseBean().successMethod("激活成功，请到登录页面进行登录");
-        } else if (success == 2 || success == -1) {
-            throw new RuntimeException("activation erro");
+        } else {
+            return new ResponseBean().successMethod("激活失败");
         }
-        return new ResponseBean().successMethod("activation erro");
     }
 
     //查询邮箱是否存在

@@ -59,5 +59,5 @@ public interface AuxiliaryUserService {
      * @param code
      * @return
      */
-    int activationUser(String code) throws Exception;
+    boolean activationUser(String code) throws Exception;
 }

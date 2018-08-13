@@ -106,6 +106,8 @@ public class VideoBean {
 
     public void setUserBean(UserBean userBean) {
         userBean.setUserPassword("");
+        userBean.setRegisterTime(null);
+        userBean.setUserEmail("");
         this.userBean = userBean;
     }
 

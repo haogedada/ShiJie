@@ -62,13 +62,13 @@ public class UserServiceImpl implements UserService {
     public UserBean findUserById(Integer userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             UserBean userBean = userDao.queryUserById(userId);
-            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
-                return userBean;
+            if (userBean == null || !StrJudgeUtil.isCorrectInt(userBean.getUserId())) {
+                throw new RuntimeException("用户不存在");
             } else {
-                throw new RuntimeException("findUserById错误");
+                return userBean;
             }
         } else {
-            throw new RuntimeException("userId不合法");
+            throw new RuntimeException("用户id不合法");
         }
     }
 
@@ -88,50 +88,9 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("findUserAndAuxById错误");
             }
         } else {
-            throw new RuntimeException("userId不合法");
+            throw new RuntimeException("用户不存在");
         }
 
-    }
-
-    /**
-     * 通过用户id查询关联Collection表信息区域
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public UserBean findUserAndCollById(Integer userId) {
-        if (StrJudgeUtil.isCorrectInt(userId)) {
-            UserBean userBean = userDao.queryUserAndCollById(userId);
-            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
-                return userBean;
-            } else {
-                throw new RuntimeException("findUserAndCollById");
-            }
-        } else {
-            throw new RuntimeException("userId不合法");
-        }
-    }
-
-    /**
-     * 通过用户id和关系类型查询关联Friend表信息区域
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public UserBean findUserAndFriendById(Integer userId, String friendType) {
-        if (StrJudgeUtil.isCorrectInt(userId) &&
-                (friendType.equals(Constants.friendType.FANS.getName()) || friendType.equals(Constants.friendType.FOLLOW.getName()))) {
-            UserBean userBean = userDao.queryUserAndFriendById(userId, friendType);
-            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
-                return userBean;
-            } else {
-                throw new RuntimeException("findUserAndFriendById");
-            }
-        } else {
-            throw new RuntimeException("userId不合法");
-        }
     }
 
     /**
@@ -145,12 +104,11 @@ public class UserServiceImpl implements UserService {
         String userName = JWTUtil.getUsername(token);
         UserBean userBean = userDao.queryUserByName(userName);
         userBean.setUserPassword("");
-        if (userBean != null && StrJudgeUtil.isCorrectInt(userBean.getUserId())) {
-            return userBean;
+        if (userBean == null || !StrJudgeUtil.isCorrectInt(userBean.getUserId())) {
+            throw new RuntimeException("用户不存在");
         } else {
-            throw new RuntimeException("获取不到用户信息");
+            return userBean;
         }
-
     }
 
     /**
@@ -173,27 +131,6 @@ public class UserServiceImpl implements UserService {
         userHome.setFansNum(fansNum);
         userHome.setFollowNum(followNum);
         return userHome;
-    }
-
-    @Override
-    @Transactional
-    public boolean addUser(UserBean user) {
-        if ((user.getUserName() != null && !user.getUserName().equals("")) &&
-                (user.getUserPassword() != null && !user.getUserPassword().equals(""))
-                && (user.getUserEmail() != null && !user.getUserEmail().equals(""))) {
-            try {
-                int row = userDao.insertUser(user);
-                if (row > 0) {
-                    return true;
-                } else {
-                    throw new RuntimeException("插入用户信息失败！");
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("插入用户信息失败：" + e.getMessage());
-            }
-        } else {
-            throw new RuntimeException("用户名或密码或邮箱信息不能为空！");
-        }
     }
 
     /**
@@ -231,7 +168,7 @@ public class UserServiceImpl implements UserService {
                             try {
                                 int ares = auxiliaryUserDao.insertAuxiliaryUser(auxiliaryUserBean);
                                 if (ares > 0) {
-                                    String mailType =ACTIVATION.getName();
+                                    String mailType = ACTIVATION.getName();
                                     new Thread(new MailUtil(email, code, mailType)).start();
                                     return true;
                                 } else {
@@ -244,7 +181,6 @@ public class UserServiceImpl implements UserService {
                     } catch (Exception e) {
                         throw new RuntimeException(e.getMessage());
                     }
-
                 } else {
                     throw new RuntimeException("邮箱不合法");
                 }
@@ -255,6 +191,30 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("输入信息不能为空");
         }
         return false;
+    }
+
+    /**
+     * 修改用户信息
+     *
+     * @param userBean
+     * @return
+     */
+    public boolean modifyUser(UserBean userBean) {
+        if (StrJudgeUtil.isCorrectInt(userBean.getUserId()) && userBean != null) {
+            try {
+                int res = userDao.updateUser(userBean);
+                if (res > 0) {
+                    return true;
+                } else {
+                    throw new RuntimeException("修改信息失败");
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -289,8 +249,8 @@ public class UserServiceImpl implements UserService {
                 userBean1.setUserBirthday(userBean.getUserBirthday());
                 try {
                     boolean success = fileService.upLoadFile(files, filesPath, filesName);
-                    int res = userDao.updateUser(userBean1);
-                    if (res > 0 && success) {
+                    boolean res = modifyUser(userBean1);
+                    if (res && success) {
                         return true;
                     } else {
                         return false;
@@ -315,19 +275,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean delUser(Integer userId) {
-        if (userId != null && userId > 0) {
+        if (StrJudgeUtil.isCorrectInt(userId)) {
             try {
                 int row = userDao.deleteUser(userId);
                 if (row > 0) {
                     return true;
                 } else {
-                    throw new RuntimeException("删除区域信息失败！");
+                    throw new RuntimeException("删除用户失败！");
                 }
             } catch (Exception e) {
-                throw new RuntimeException("删除区域信息失败：" + e.getMessage());
+                throw new RuntimeException("删除删除用户出错：" + e.getMessage());
             }
         } else {
-            throw new RuntimeException("区域id不能为空！");
+            throw new RuntimeException("用户id参数不合法");
         }
     }
 
@@ -362,7 +322,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserHomeBean goUserHomeByUid(Integer userId) {
         UserHomeBean userHome = new UserHomeBean();
-        UserBean userBean = userDao.queryUserById(userId);
+        UserBean userBean = findUserById(userId);
         int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FANS.getName()).size();
         int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName()).size();
         List<VideoBean> videos = videoDao.queryVideosByUid(userBean.getUserId());

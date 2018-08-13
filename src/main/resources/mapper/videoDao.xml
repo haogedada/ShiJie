@@ -13,10 +13,11 @@
      -->
     <!--sql多个查询-->
     <!--关系映射-->
-    <resultMap type="com.haoge.shijie.pojo.VideoBean" id="ResultMap">
+    <resultMap type="com.haoge.shijie.pojo.VideoBean" id="resultMap">
         <id property="videoId" column="video_id"/>
         <result property="userId" column="user_id"/>
         <result property="videoTitle" column="video_title"/>
+        <result property="videoContent" column="video_content"/>
         <result property="playerCount" column="player_count"/>
         <result property="videoTipNum" column="video_tip_num"/>
         <result property="videoTrampleNum" column="video_trample_num"/>
@@ -37,7 +38,6 @@
             <result property="userEmail" column="user_email"/>
             <result property="headimgUrl" column="headimg_url"/>
         </association>
-
     </resultMap>
     <select id="queryVideoList" resultType="com.haoge.shijie.pojo.VideoBean">
         SELECT
@@ -70,13 +70,13 @@
     <!--WHERE-->
     <!--t.user_id=#{userId}-->
     <!--</select>-->
-    <select id="queryVideoByVid" resultType="com.haoge.shijie.pojo.VideoBean" resultMap="ResultMap">
+    <select id="queryVideoByVid" resultType="com.haoge.shijie.pojo.VideoBean" resultMap="resultMap">
         SELECT
         *
         FROM
-        Tb_video t
+        Tb_video t,Tb_user u
         WHERE
-        t.video_id=#{videoId}
+        t.video_id=#{videoId} AND u.user_id=t.user_id
     </select>
     <insert id="insertVideo" useGeneratedKeys="true" keyProperty="videoId"
             keyColumn="video_id" parameterType="com.haoge.shijie.pojo.VideoBean">

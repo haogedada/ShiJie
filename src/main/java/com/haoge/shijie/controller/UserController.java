@@ -7,7 +7,6 @@ import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.UserHomeBean;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.UserService;
-import com.haoge.shijie.service.VideoService;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +20,6 @@ public class UserController {
     private final static String UPLOADPATH = "/upLoadFile/";
     @Autowired
     private UserService userService;
-    @Autowired
-    private VideoService videoService;
 
     /**
      * Log4j日志处理
@@ -107,46 +104,4 @@ public class UserController {
         UserHomeBean userHome = userService.goUserHomeByUid(userId);
         return new ResponseBean().successMethod(userHome);
     }
-
-
-//
-//    @GetMapping("/users")
-//    @SerializedField(includes={"code","msg","data"},encryptions = {"data"})
-//    public ResponseBean gouserlist(){
-//        List<UserBean> list = userService.findUsers();
-//        return new ResponseBean().successMethod(list);
-//    }
-//    @PostMapping("/users")
-//    public @ResponseBody ResponseBean goinsteruser(@RequestBody UserBean user){
-//        boolean res=userService.addUser(user);
-//        if(res){
-//            return new ResponseBean().successMethod();
-//        }else {
-//            return new ResponseBean().failMethod(0,"fail");
-//        }
-//    }
-//    @PutMapping("/users")
-//    public  @ResponseBody ResponseBean updataArea(@RequestBody UserBean user){
-//        boolean res = userService.modifyUser(user);
-//        if(res){
-//            return new ResponseBean().successMethod();
-//        }else {
-//            return new ResponseBean().failMethod(0,"fail");
-//        }
-//    }
-//    @DeleteMapping("/users/{id}")
-//    public  @ResponseBody ResponseBean deleteArea(@PathVariable("id") Integer userId){
-//        boolean res = userService.delUser(userId);
-//        if(res){
-//            return new ResponseBean().successMethod();
-//        }else {
-//            return new ResponseBean().failMethod(0,"fail");
-//        }
-//    }
-//    @RequestMapping(path = "/401")
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    public ResponseBean unauthorized() {
-//        return new ResponseBean(401,"Unauthorized");
-//    }
-
 }

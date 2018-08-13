@@ -1,7 +1,6 @@
 package com.haoge.shijie.pojo;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 public class UserBean {
     private Integer userId;
@@ -9,9 +8,7 @@ public class UserBean {
             bardianSign, headimgUrl, userEmail;
     private Timestamp registerTime;
     private AuxiliaryUserBean auxiliaryUserBean;
-    private List<VideoBean> videoBeans;
-    private List<UserFriendsBean> userFriends;
-    private List<CollectionBean> collections;
+
 
     public UserBean() {
     }
@@ -117,30 +114,6 @@ public class UserBean {
 
     public void setAuxiliaryUserBean(AuxiliaryUserBean auxiliaryUserBean) {
         this.auxiliaryUserBean = auxiliaryUserBean;
-    }
-
-    public List<VideoBean> getVideoBeans() {
-        return videoBeans;
-    }
-
-    public void setVideoBeans(List<VideoBean> videoBeans) {
-        this.videoBeans = videoBeans;
-    }
-
-    public List<UserFriendsBean> getUserFriends() {
-        return userFriends;
-    }
-
-    public void setUserFriends(List<UserFriendsBean> userFriends) {
-        this.userFriends = userFriends;
-    }
-
-    public List<CollectionBean> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(List<CollectionBean> collections) {
-        this.collections = collections;
     }
 
 }

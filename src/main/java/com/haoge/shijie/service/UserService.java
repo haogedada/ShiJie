@@ -32,22 +32,6 @@ public interface UserService {
     UserBean findUserAndAuxById(Integer userId);
 
     /**
-     * 根据id查询关联区域
-     *
-     * @param userId
-     * @return
-     */
-    UserBean findUserAndCollById(Integer userId);
-
-    /**
-     * 根据id查询关联区域
-     *
-     * @param userId
-     * @return
-     */
-    UserBean findUserAndFriendById(Integer userId, String friendType);
-
-    /**
      * 根据token查询区域
      *
      * @param token
@@ -62,15 +46,6 @@ public interface UserService {
      * @return
      */
     UserHomeBean goUserHomeByToken(String token);
-
-
-    /**
-     * 新增区域信息
-     *
-     * @param user
-     * @return
-     */
-    boolean addUser(UserBean user);
 
     /**
      * 新增区域信息
@@ -91,10 +66,10 @@ public interface UserService {
     /**
      * 根据id删除区域
      *
-     * @param userID
+     * @param userId
      * @return
      */
-    boolean delUser(Integer userID);
+    boolean delUser(Integer userId);
 
     /**
      * 根据token查询关注列表

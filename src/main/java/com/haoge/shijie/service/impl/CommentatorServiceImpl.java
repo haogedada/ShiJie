@@ -1,12 +1,10 @@
 package com.haoge.shijie.service.impl;
 
 import com.haoge.shijie.dao.CommentatorDao;
-import com.haoge.shijie.dao.UserDao;
-import com.haoge.shijie.dao.VideoDao;
 import com.haoge.shijie.pojo.CommentatorBean;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.service.CommentatorService;
-import com.haoge.shijie.util.JWTUtil;
+import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,78 +17,109 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Autowired
     private CommentatorDao commentatorDao;
     @Autowired
-    private UserDao userDao;
-    @Autowired
-    private VideoDao videoDao;
-
+    private UserService userService;
 
     /**
      * 查找所有评论
+     *
      * @return
      */
     @Override
     public List<CommentatorBean> findCommentatorList() {
-        return commentatorDao.queryCommentatorList();
+        List<CommentatorBean> commentatorBeans = commentatorDao.queryCommentatorList();
+        if (commentatorBeans.size() > 0) {
+            return commentatorBeans;
+        } else {
+            throw new RuntimeException("没有数据");
+        }
     }
 
     /**
      * 查找视频的评论
+     *
      * @param toVideoId
      * @return
      */
     @Override
     public List<CommentatorBean> findCommByVdoIds(Integer toVideoId) {
-        if (toVideoId == null || toVideoId < 0) {
-            throw new RuntimeException("toVideoId值非法");
+        if (StrJudgeUtil.isCorrectInt(toVideoId)) {
+            List<CommentatorBean> commentatorBeans = commentatorDao.queryCommByVdoIds(toVideoId);
+            if (commentatorBeans.size() > 0) {
+                return commentatorBeans;
+            } else {
+                throw new RuntimeException("没有数据");
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
         }
-        return commentatorDao.queryCommByVdoIds(toVideoId);
     }
 
     /**
      * 查找评论列表根据视频id和用户id
+     *
      * @param toVideoId
      * @param toUserId
      * @return
      */
     @Override
     public List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toUserId) {
-        if (toVideoId == null || toVideoId < 0) {
-            throw new RuntimeException("toVideoId,toUserId值非法");
+        if (StrJudgeUtil.isCorrectInt(toVideoId) && StrJudgeUtil.isCorrectInt(toUserId)) {
+            List<CommentatorBean> commentatorBeans = commentatorDao.queryByVdoIdAndTuds(toVideoId, toUserId);
+            if (commentatorBeans.size() > 0) {
+                return commentatorBeans;
+            } else {
+                throw new RuntimeException("没有数据");
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
         }
-        return commentatorDao.queryByVdoIdAndTuds(toVideoId, toUserId);
     }
 
     /**
-     * 查找评论根据视频id
+     * 根据videoId查询该视频的评论数
+     *
      * @param toVideoId
      * @return
      */
     @Override
     public int findCountByVdoId(Integer toVideoId) {
-        if (toVideoId == null || toVideoId < 0) {
-            throw new RuntimeException("toVideoId值非法");
+        if (StrJudgeUtil.isCorrectInt(toVideoId)) {
+            int count = commentatorDao.queryCountByVdoId(toVideoId);
+            if (count >= 0) {
+                return count;
+            } else {
+                throw new RuntimeException("数据异常");
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
         }
-        return commentatorDao.queryCountByVdoId(toVideoId);
     }
 
     /**
-     * 查找评论根据用户id
+     * 根据UserId查询该视频的评论者的评论数
+     *
      * @param toUserId
      * @return
      */
     @Override
     public int findCountByUserId(Integer toUserId) {
-        if (toUserId == null || toUserId < 0) {
-            throw new RuntimeException("toVideoId值非法");
+        if (StrJudgeUtil.isCorrectInt(toUserId)) {
+            int count = commentatorDao.queryCountByUserId(toUserId);
+            if (count >= 0) {
+                return count;
+            } else {
+                throw new RuntimeException("数据异常");
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
         }
-        return commentatorDao.queryCountByUserId(toUserId);
     }
 
     @Override
     @Transactional
     public boolean addCommentator(CommentatorBean commentator) {
-        if ((commentator.getToUserId() != null && commentator.getToUserId() >= 0) &&
-                (commentator.getToVideoId() != null && commentator.getToVideoId() >= 0)) {
+        if (StrJudgeUtil.isCorrectInt(commentator.getToUserId()) &&
+                StrJudgeUtil.isCorrectInt(commentator.getToVideoId())) {
             try {
                 int res = commentatorDao.insertCommentator(commentator);
                 if (res > 0) {
@@ -102,34 +131,26 @@ public class CommentatorServiceImpl implements CommentatorService {
                 throw new RuntimeException(e.getMessage());
             }
         } else {
-            throw new RuntimeException("toUserId,toVideoId值非法");
+            throw new RuntimeException("参数不合法");
         }
     }
 
     /**
      * 添加视频评论
-     * @param toVideoId,token,content
-     * @param token
+     *
      * @param content
+     * @param token
      * @return
      */
     @Override
     @Transactional
-    public boolean addVideoCommentator(Integer toVideoId, String token, String content) {
-        if (StrJudgeUtil.isCorrectInt(toVideoId) &&
-                StrJudgeUtil.isCorrectStr(token) &&
-                StrJudgeUtil.isCorrectStr(content)) {
-            String userName = JWTUtil.getUsername(token);
-            UserBean userBean = userDao.queryUserByName(userName);
-            CommentatorBean commentator = new CommentatorBean();
-            commentator.setToVideoId(toVideoId);
-            commentator.setTxtContext(content);
-            commentator.setUserId(userBean.getUserId());
-            commentator.setToUserId(-1);
-            commentator.setCommentatorTipNum(0);
-            commentator.setCommentatorTrampleNum(0);
+    public boolean addVideoCommentator(CommentatorBean content, String token) {
+        if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId())) {
+            UserBean userBean = userService.findUserByToken(token);
+            content.setUserId(userBean.getUserId());
+            content.setToUserId(-1);
             try {
-                int res = commentatorDao.insertCommentator(commentator);
+                int res = commentatorDao.insertCommentator(content);
                 if (res > 0) {
                     return true;
                 } else {
@@ -145,30 +166,20 @@ public class CommentatorServiceImpl implements CommentatorService {
 
     /**
      * 添加评论者的评论
-     * @param toVideoId,toUserId,token,content
-     * @param toUserId
+     *
+     * @param content 评论
      * @param token
-     * @param content
      * @return
      */
     @Override
     @Transactional
-    public boolean addUserCommentator(Integer toVideoId, Integer toUserId, String token, String content) {
-        if (StrJudgeUtil.isCorrectInt(toVideoId) &&
-                StrJudgeUtil.isCorrectStr(token) &&
-                StrJudgeUtil.isCorrectStr(content) &&
-                StrJudgeUtil.isCorrectInt(toUserId)) {
-            String userName = JWTUtil.getUsername(token);
-            UserBean userBean = userDao.queryUserByName(userName);
-            CommentatorBean commentator = new CommentatorBean();
-            commentator.setToVideoId(toVideoId);
-            commentator.setTxtContext(content);
-            commentator.setUserId(userBean.getUserId());
-            commentator.setToUserId(toUserId);
-            commentator.setCommentatorTipNum(0);
-            commentator.setCommentatorTrampleNum(0);
+    public boolean addUserCommentator(CommentatorBean content, String token) {
+        if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId()) &&
+                StrJudgeUtil.isCorrectInt(content.getToUserId())) {
+            UserBean userBean = userService.findUserByToken(token);
+            content.setUserId(userBean.getUserId());
             try {
-                int res = commentatorDao.insertCommentator(commentator);
+                int res = commentatorDao.insertCommentator(content);
                 if (res > 0) {
                     return true;
                 } else {
@@ -184,14 +195,14 @@ public class CommentatorServiceImpl implements CommentatorService {
 
     /**
      * 修改评论
+     *
      * @param commentator
      * @return
      */
     @Override
     @Transactional
     public boolean modifyCommentator(CommentatorBean commentator) {
-        if ((commentator.getToUserId() != null && commentator.getToUserId() >= 0) &&
-                (commentator.getToVideoId() != null && commentator.getToVideoId() >= 0)) {
+        if (commentator != null && StrJudgeUtil.isCorrectInt(commentator.getToVideoId())) {
             try {
                 int res = commentatorDao.updateCommentator(commentator);
                 if (res > 0) {
@@ -203,19 +214,20 @@ public class CommentatorServiceImpl implements CommentatorService {
                 throw new RuntimeException(e.getMessage());
             }
         } else {
-            throw new RuntimeException("toUserId,toVideoId值非法");
+            throw new RuntimeException("参数非法");
         }
     }
 
     /**
      * 删除评论
+     *
      * @param txtId
      * @return
      */
     @Override
     @Transactional
     public boolean delCommentator(Integer txtId) {
-        if (txtId != null && txtId >= 0) {
+        if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {
                 int res = commentatorDao.deleteCommentator(txtId);
                 if (res > 0) {
@@ -227,87 +239,14 @@ public class CommentatorServiceImpl implements CommentatorService {
                 throw new RuntimeException(e.getMessage());
             }
         } else {
-            throw new RuntimeException("txtId非法");
+            throw new RuntimeException("参数不合法");
         }
     }
 
-    /**
-     * 视频顶一下
-     * @param VideoId
-     * @param token
-     * @return
-     */
-    @Override
-    @Transactional
-    public boolean modifyVideoTop(Integer VideoId, String token) {
-        if (StrJudgeUtil.isCorrectInt(VideoId)) {
-            try {
-                int res = videoDao.updateVdoTopAdd(VideoId);
-                if (res > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage() + "顶一下出错");
-            }
-        } else {
-            throw new RuntimeException("顶一下视频参数错误");
-        }
-    }
-
-    /**
-     * 视频踩一下
-     * @param VideoId
-     * @param token
-     * @return
-     */
-    @Override
-    @Transactional
-    public boolean modifyVideoTrample(Integer VideoId, String token) {
-        if (StrJudgeUtil.isCorrectInt(VideoId)) {
-            try {
-                int res = videoDao.updateVdeoTraAdd(VideoId);
-                if (res > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage() + "踩一下出错");
-            }
-        } else {
-            throw new RuntimeException("踩一下视频参数错误");
-        }
-    }
-
-    /**
-     * 视频播放次数
-     * @param VideoId
-     * @param token
-     * @return
-     */
-    @Override
-    @Transactional
-    public boolean modifyVideoPlayCount(Integer VideoId, String token) {
-        if (StrJudgeUtil.isCorrectInt(VideoId)) {
-            try {
-                int res = videoDao.updatePlayCountAdd(VideoId);
-                if (res > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage() + "播放量+1出错");
-            }
-        } else {
-            throw new RuntimeException("修改播放量参数错误");
-        }
-    }
 
     /**
      * 评论顶一下
+     *
      * @param txtId
      * @param token
      * @return
@@ -333,6 +272,7 @@ public class CommentatorServiceImpl implements CommentatorService {
 
     /**
      * 评论踩一下
+     *
      * @param txtId
      * @param token
      * @return

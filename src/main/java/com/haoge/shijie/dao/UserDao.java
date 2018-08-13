@@ -1,7 +1,6 @@
 package com.haoge.shijie.dao;
 
 import com.haoge.shijie.pojo.UserBean;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -29,23 +28,6 @@ public interface UserDao {
      * @return
      */
     UserBean queryUserAndAuxById(Integer userId);
-
-
-    /**
-     * 根据id查询关联Friend表信息区域
-     *
-     * @param userId
-     * @return
-     */
-    UserBean queryUserAndFriendById(@Param("userId") Integer userId, @Param("friendType") String friendType);
-
-    /**
-     * 根据id查询关联Collection表信息区域
-     *
-     * @param userId
-     * @return
-     */
-    UserBean queryUserAndCollById(Integer userId);
 
     /**
      * 根据用户名查询区域

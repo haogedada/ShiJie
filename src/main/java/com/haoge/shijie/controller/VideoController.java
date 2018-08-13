@@ -15,10 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class VideoController {
 
+    private final String UPLOADPATH = "/upLoadFile/";
     @Autowired
     private VideoService videoService;
-
-    private final String UPLOADPATH = "/upLoadFile/";
 
     //视频上传
     @PostMapping("/user/video")
@@ -43,23 +42,25 @@ public class VideoController {
     @GetMapping("/user/video/{videoId}")
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean getVideo(@PathVariable("videoId") Integer videoId) {
-        VideoBean videoBean = videoService.findVideo(videoId);
+        VideoBean videoBean = videoService.findVideoByVid(videoId);
         return new ResponseBean().successMethod(videoBean);
     }
+
     //删除视频
-    @DeleteMapping("/user/video")
+    @DeleteMapping("/user/video/{videoId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean delVideo(@RequestHeader("Authorization") String token,
-                                 @RequestParam("videoId") Integer videoId
+                                 @PathVariable("videoId") Integer videoId
     ) {
-        boolean success = videoService.delVideo(token, videoId);
+        boolean success = videoService.delVideoByVid(token, videoId);
         if (success) {
             return new ResponseBean().successMethod();
         } else {
             return new ResponseBean().failMethod(500, "删除失败");
         }
     }
+
     //修改视频
     @PutMapping("/user/video")
     @RequiresAuthentication

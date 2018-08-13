@@ -22,7 +22,7 @@ public interface VideoService {
      * @param videoId
      * @return
      */
-    boolean delVideo(String token, Integer videoId);
+    boolean delVideoByVid(String token, Integer videoId);
 
     /**
      * 修改视频及修改封面
@@ -49,5 +49,33 @@ public interface VideoService {
      * @param videoId
      * @return
      */
-    VideoBean findVideo(Integer videoId);
+    VideoBean findVideoByVid(Integer videoId);
+
+    /**
+     * 视频顶一下
+     *
+     * @param toVideoId
+     * @param token
+     * @return 是否成功
+     */
+    boolean modifyVideoTop(Integer toVideoId, String token);
+
+    /**
+     * 视频踩一下
+     *
+     * @param VideoId
+     * @param token
+     * @return 是否成功
+     */
+    boolean modifyVideoTrample(Integer VideoId, String token);
+
+    /**
+     * 视频播放量+1
+     *
+     * @param VideoId
+     * @param token
+     * @return 是否成功
+     */
+    boolean modifyVideoPlayCount(Integer VideoId, String token);
+
 }

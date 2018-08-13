@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class CollectionBean {
     private Integer id, userId, videoId;
     private Timestamp creatTime;
+    private UserBean userBean;
     private VideoBean videoBean;
 
     public CollectionBean() {
@@ -56,5 +57,13 @@ public class CollectionBean {
 
     public void setVideoBean(VideoBean videoBean) {
         this.videoBean = videoBean;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 }
