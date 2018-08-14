@@ -41,12 +41,17 @@ public class LoginServiceImpl implements LoginService {
     @Cacheable
     public ResponseBean getToken(String userName, String userPassword) {
         UserBean user = null;
+        UserBean userBean = null;
         if ((!userName.equals("") && userName != null) &&
                 (!userPassword.equals("") && userPassword != null)) {
             try {
-                user = userService.findUserAndAuxById(loginDao.userLoginQueryByName(userName).getUserId());
+                userBean = loginDao.userLoginQueryByName(userName);
+                user = userService.findUserAndAuxById(userBean.getUserId());
             } catch (Exception e) {
-                throw new RuntimeException(e.getMessage() + "findToken：获取登录信息失败");
+                if (userBean == null || user == null) {
+                    throw new RuntimeException("用户不存在");
+                }
+                throw new RuntimeException(e.getMessage() + "获取登录信息失败");
             }
         } else {
             throw new RuntimeException("用户账号不合法");

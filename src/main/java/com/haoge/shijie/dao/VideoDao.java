@@ -1,6 +1,7 @@
 package com.haoge.shijie.dao;
 
 import com.haoge.shijie.pojo.VideoBean;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -26,6 +27,36 @@ public interface VideoDao {
      */
     VideoBean queryVideoByVid(Integer videoId);
 
+    /**
+     * 根据视频类型查询列表并按播放量排序
+     *
+     * @param videoType
+     * @return
+     */
+    List<VideoBean> queryVideosByType(@Param("videoType") String videoType, @Param("start") Integer pageIndex, @Param("end") Integer pageSize);
+
+    /**
+     * 根据关键字查询
+     *
+     * @param keyword
+     * @return
+     */
+    List<VideoBean> queryVideosByAll(@Param("keyword") String keyword, @Param("start") Integer pageIndex, @Param("end") Integer pageSize);
+
+    /**
+     * 根据视频类型查询个数
+     *
+     * @param videoType
+     * @return
+     */
+    int queryCountByType(@Param("videoType") String videoType);
+
+    /**
+     * 搜索的总条数
+     * @param keyword
+     * @return
+     */
+     int queryCountByAll(@Param("keyword") String keyword);
     /**
      * 查询最后插入的视频
      *

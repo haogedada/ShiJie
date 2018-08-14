@@ -1,8 +1,10 @@
 package com.haoge.shijie.service.impl;
 
+import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.dao.VideoDao;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
+import com.haoge.shijie.pojo.respModelBean.Paging;
 import com.haoge.shijie.service.FileService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.service.VideoService;
@@ -19,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 import static com.haoge.shijie.constant.Constants.pathType.VIDEOCOVERPATH;
 import static com.haoge.shijie.constant.Constants.pathType.VIDEOPATH;
@@ -105,7 +109,7 @@ public class VideoServiceImpl implements VideoService {
             UserBean userBean = userService.findUserByToken(token);
             VideoBean videoBean1 = findVideoByVid(videoBean.getVideoId());
             if (userBean.getUserId() == videoBean1.getUserId()) {
-                String[] coversPath = new String[]{filePath + VIDEOCOVERPATH};
+                String[] coversPath = new String[]{filePath + VIDEOCOVERPATH.getName()};
                 MultipartFile[] coversFile = new MultipartFile[]{coverFile};
                 String[] coversName = null;
                 String imgType = coverFile.getContentType();
@@ -207,6 +211,7 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true)})
     public boolean addVideo(String title, String content, String token, MultipartFile[] file, String filePath) {
         String[] fileType = null;
         String[] filesPath = new String[]{filePath + VIDEOPATH.getName(), filePath + VIDEOCOVERPATH.getName()};
@@ -250,6 +255,7 @@ public class VideoServiceImpl implements VideoService {
                         videoBean.setUserId(user.getUserId());
                         videoBean.setVideoTitle(title);
                         videoBean.setVideoContent(content);
+                        // videoBean.setVideoType(Constants.videoType.);
                         videoBean.setPlayerCount(0);
                         videoBean.setVideoTipNum(0);
                         videoBean.setVideoTrampleNum(0);
@@ -300,6 +306,64 @@ public class VideoServiceImpl implements VideoService {
             }
         } else {
             throw new RuntimeException("修改播放量参数错误");
+        }
+    }
+
+    /**
+     * 搜索视频
+     * @param pageIndex
+     * @param pageSize
+     * @param content
+     * @return
+     */
+    @Override
+    @Cacheable(value = "userAndVideo")
+    public Paging searchVideos(Integer pageIndex, Integer pageSize, String content) {
+        if(StrJudgeUtil.isCorrectInt(pageIndex)&&
+           StrJudgeUtil.isCorrectInt(pageSize)&&
+           StrJudgeUtil.isCorrectStr(content)){
+            int count=videoDao.queryCountByAll(content);
+            int totalPage=(count+pageSize-1)/pageSize;
+            if(count>0) {
+                if (pageIndex<1){
+                    pageIndex=1;
+                }else if (totalPage<pageIndex){
+                  pageIndex = totalPage;
+                }
+                List<VideoBean> videos = videoDao.queryVideosByAll(content, (pageIndex-1)*pageSize, pageSize);
+                return new Paging(pageIndex,totalPage,videos);
+            }else {
+                throw new RuntimeException("搜索不到视频");
+            }
+        }else {
+            throw new RuntimeException("参数不合法");
+        }
+    }
+
+    @Override
+    @Cacheable(value = "userAndVideo")
+    public Paging showByType(Integer pageIndex, Integer pageSize, String videoType) {
+        if(StrJudgeUtil.isCorrectInt(pageIndex)&&
+                StrJudgeUtil.isCorrectInt(pageSize)&&
+                StrJudgeUtil.isCorrectStr(videoType)){
+            if (!Constants.videoType.isValueOf(videoType)){
+                throw new RuntimeException("没有该分类");
+            }
+            int count=videoDao.queryCountByType(videoType);
+            int totalPage=(count+pageSize-1)/pageSize;
+            if(count>0) {
+                if (pageIndex<1){
+                    pageIndex=1;
+                }else if (totalPage<pageIndex){
+                    pageIndex = totalPage;
+                }
+                List<VideoBean> videos = videoDao.queryVideosByType(videoType, (pageIndex-1)*pageSize, pageSize);
+                return new Paging(pageIndex,totalPage,videos);
+            }else {
+                throw new RuntimeException("该分类没有视频");
+            }
+        }else {
+            throw new RuntimeException("参数不合法");
         }
     }
 

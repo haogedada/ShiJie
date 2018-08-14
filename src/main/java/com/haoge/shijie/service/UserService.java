@@ -104,4 +104,21 @@ public interface UserService {
     boolean modifyPassword(String userName, String code, String password);
 
 
+    /**
+     * 添加好友
+     *
+     * @param token
+     * @param friendId
+     * @return
+     */
+    boolean addFollow(String token, Integer friendId);
+
+    /**
+     * 取消关注
+     *
+     * @param token
+     * @param friendId
+     * @return
+     */
+    boolean delFollow(String token, Integer friendId);
 }

@@ -17,6 +17,8 @@ public interface UserFriendsDao {
     List<UserBean> queryFriendByIdAndType(@Param("userId") Integer userId, @Param("friendType") String friendType);
 
 
+    int queryFriendCount(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
     /**
      * 新增区域信息
      *

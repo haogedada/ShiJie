@@ -115,7 +115,7 @@ public class Constants {
      */
     public enum prefixType {
         COVERIMGPREFIX(1, "videocover-"),
-        VIDEOPREFIX(2, "video"),
+        VIDEOPREFIX(2, "video-"),
         HEADIMGPREFIX(3, "userheadimg-");
         private final Integer value;
         private final String name;
@@ -158,4 +158,54 @@ public class Constants {
             return name;
         }
     }
+
+    /**
+     * 视频类型
+     */
+    public enum videoType {
+        SOCIOLOGY(1, "sociology", "社会"),
+        WORLD(2, "world", "世界"),
+        SPORTS(3, "sports", "体育"),
+        LIFE(4, "life", "生活"),
+        TECH(5, "tech", "科技"),
+        ENTERTAINMENT(6, "entertainment", "娱乐"),
+        MOVIE(7, "movie", "电影"),
+        AUTO(8, "auto", "汽车"),
+        TASTE(9, "taste", "美食"),
+        MUSIC(10, "music", "音乐"),
+        BUSINESS(11, "business", "商业"),
+        HOT(12, "hot", "热门");
+        private final Integer index;
+        private final String name;
+        private final String value;
+
+        videoType(Integer index, String name, String value) {
+            this.index = index;
+            this.name = name;
+            this.value = value;
+        }
+
+        public Integer getIndex() {
+            return index;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static boolean isValueOf(String type) {
+            for (int i=0;i<values().length;i++) {
+                if (values()[i].getName().equals(type)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+
 }

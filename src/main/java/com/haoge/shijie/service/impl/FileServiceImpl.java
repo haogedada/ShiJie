@@ -36,8 +36,8 @@ public class FileServiceImpl implements FileService {
             }
         } else if (file.length == 2 && fileName.length == 2 && filePath.length == 2) {
             for (; ; ) {
-                Future<String> ok2 = fileUtil.uploadFile(file[1].getBytes(), filePath[1], fileName[1]);
-                if (ok1.isDone() && ok2.isDone()) {
+                if (ok1.isDone()) {
+                    fileUtil.uploadFile(file[1].getBytes(), filePath[1], fileName[1]);
                     return true;
                 }
                 Thread.sleep(100);

@@ -17,12 +17,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.concurrent.Future;
 
+import static com.haoge.shijie.constant.Constants.prefixType.HEADIMGPREFIX;
+
 @Component
 public class FileUtil {
     private final static String PREFIX_VIDEO = "video/";
     private final static String PREFIX_IMAGE = "image/";
-    private final static String TITLE = "视界";
-    private final static String QUFENFU = "userheadimg-";
+    private final String TITLE = "视界";
     private Font font = new Font("微软雅黑", Font.PLAIN, 40);
     private Color color = new Color(255, 255, 255, 128);
 
@@ -116,8 +117,11 @@ public class FileUtil {
         out.write(file);
         out.flush();
         out.close();
-        if (isImgTypeByExt(fileName) && !fileName.contains(QUFENFU)) {
-            addWaterMark(filePath + fileName, filePath + fileName);
+        if (isImgTypeByExt(fileName) && !fileName.contains(HEADIMGPREFIX.getName())) {
+            boolean success = addWaterMark(filePath + fileName);
+            if (success) {
+                return new AsyncResult<String>("ok");
+            }
         }
         return new AsyncResult<String>("ok");
     }
@@ -199,10 +203,8 @@ public class FileUtil {
      * 图片添加水印
      *
      * @param srcImgPath 源图片路径
-     * @param tarImgPath 保存的图片路径
      */
-    // @Async
-    public void addWaterMark(String srcImgPath, String tarImgPath) {
+    public boolean addWaterMark(String srcImgPath) {
         try {
             // 读取原图片信息
             File srcImgFile = new File(srcImgPath);//得到文件
@@ -221,10 +223,11 @@ public class FileUtil {
             g.drawString(TITLE, x, y);  //画出水印
             g.dispose();
             // 输出图片
-            FileOutputStream outImgStream = new FileOutputStream(tarImgPath);
+            FileOutputStream outImgStream = new FileOutputStream(srcImgPath);
             ImageIO.write(bufImg, "jpg", outImgStream);
             outImgStream.flush();
             outImgStream.close();
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

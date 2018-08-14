@@ -39,6 +39,7 @@
         <result property="userId" column="user_id"/>
         <result property="videoTitle" column="video_title"/>
         <result property="videoContent" column="video_content"/>
+        <result property="videoType" column="video_type"/>
         <result property="playerCount" column="player_count"/>
         <result property="videoTipNum" column="video_tip_num"/>
         <result property="videoTrampleNum" column="video_trample_num"/>
@@ -57,7 +58,6 @@
             <result property="headimgUrl" column="headimg_url"/>
             <result property="registerTime" column="register_time"/>
             <result property="userEmail" column="user_email"/>
-            <result property="headimgUrl" column="headimg_url"/>
         </association>
     </resultMap>
     <select id="queryCollectionList" resultType="com.haoge.shijie.pojo.CollectionBean">

@@ -23,4 +23,9 @@ public class UserFriendsDaoTest {
         }
 
     }
+
+    @Test
+    public void queryFriendCount() {
+        System.out.println(userFriendsDao.queryFriendCount(1, 2));
+    }
 }

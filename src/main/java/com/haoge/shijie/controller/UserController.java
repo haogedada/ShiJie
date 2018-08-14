@@ -93,6 +93,34 @@ public class UserController {
         return new ResponseBean().successMethod(fansList);
     }
 
+    //添加关注
+    @PutMapping("/user/follow/{friendId}")
+    @RequiresAuthentication
+    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
+    public ResponseBean addFollow(@RequestHeader("Authorization") String token,
+                                  @PathVariable("friendId") Integer friendId) {
+        boolean success = userService.addFollow(token, friendId);
+        if (success) {
+            return new ResponseBean().successMethod();
+        } else {
+            throw new RuntimeException("添加关注失败");
+        }
+    }
+
+    //取消关注
+    @DeleteMapping("/user/follow/{friendId}")
+    @RequiresAuthentication
+    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
+    public ResponseBean delFollow(@RequestHeader("Authorization") String token,
+                                  @PathVariable("friendId") Integer friendId) {
+        boolean success = userService.delFollow(token, friendId);
+        if (success) {
+            return new ResponseBean().successMethod();
+        } else {
+            throw new RuntimeException("取消关注失败");
+        }
+    }
+
     //根据userId获取其他用户信息
     @GetMapping("/user/{userId}")
     @RequiresAuthentication

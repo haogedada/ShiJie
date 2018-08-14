@@ -1,9 +1,11 @@
 package com.haoge.shijie.service;
 
 import com.haoge.shijie.pojo.VideoBean;
+import com.haoge.shijie.pojo.respModelBean.Paging;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public interface VideoService {
 
@@ -78,4 +80,21 @@ public interface VideoService {
      */
     boolean modifyVideoPlayCount(Integer VideoId, String token);
 
+    /**
+     * 搜索视频
+     * @param pageIndex
+     * @param pageSize
+     * @param content
+     * @return
+     */
+    Paging searchVideos(Integer pageIndex, Integer pageSize, String content);
+
+    /**
+     * 按视频分类显示
+     * @param pageIndex
+     * @param pageSize
+     * @param videoType
+     * @return
+     */
+    Paging showByType(Integer pageIndex, Integer pageSize, String videoType);
 }

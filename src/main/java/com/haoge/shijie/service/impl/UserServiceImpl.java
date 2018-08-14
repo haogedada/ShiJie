@@ -4,6 +4,7 @@ import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.dao.*;
 import com.haoge.shijie.pojo.AuxiliaryUserBean;
 import com.haoge.shijie.pojo.UserBean;
+import com.haoge.shijie.pojo.UserFriendsBean;
 import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.UserHomeBean;
 import com.haoge.shijie.service.FileService;
@@ -219,7 +220,8 @@ public class UserServiceImpl implements UserService {
     @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
             @CacheEvict(value = "userCache", allEntries = true),
             @CacheEvict(value = "collAndVideoAndUser", allEntries = true),
-            @CacheEvict(value = "userAndFriend", allEntries = true)
+            @CacheEvict(value = "userAndFriend", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true)
     })
     public boolean modifyUser(UserBean userBean, String token, MultipartFile file, String filePath) {
         if (StrJudgeUtil.isCorrectStr(userBean.getUserNickname()) &&
@@ -272,6 +274,7 @@ public class UserServiceImpl implements UserService {
             @CacheEvict(value = "userCache", allEntries = true),
             @CacheEvict(value = "collAndvideoAndUser", allEntries = true),
             @CacheEvict(value = "userAndFriend", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true)
     })
     public boolean delUser(Integer userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
@@ -291,7 +294,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * !!!!!注意在进行添加和删除好友后要将缓存清空
      * 获取用户朋友列表
      *
      * @param token
@@ -390,5 +392,66 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new RuntimeException("用户不存在");
         }
+    }
+
+    /**
+     * 添加关注
+     *
+     * @param token
+     * @param friendId
+     * @return
+     */
+    @Override
+    @Transactional
+    @CacheEvict(value = "userAndFriend", allEntries = true)
+    public boolean addFollow(String token, Integer friendId) {
+        UserBean userBean = this.findUserByToken(token);
+        if (StrJudgeUtil.isCorrectInt(friendId)) {
+            int count = userFriendsDao.queryFriendCount(userBean.getUserId(), friendId);
+            if (count > 0) {
+                throw new RuntimeException("你已经关注过该用户");
+            }
+            UserFriendsBean user = new UserFriendsBean();
+            user.setUserId(userBean.getUserId());
+            user.setFriendId(friendId);
+            user.setFriendType(Constants.friendType.FOLLOW.getName());
+            UserFriendsBean userFriend = new UserFriendsBean();
+            userFriend.setUserId(friendId);
+            userFriend.setFriendId(userBean.getUserId());
+            userFriend.setFriendType(Constants.friendType.FANS.getName());
+            try {
+                int res = userFriendsDao.insertUserFriend(user);
+                int res2 = userFriendsDao.insertUserFriend(userFriend);
+                if (res > 0 && res2 > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
+        }
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "userAndFriend", allEntries = true)
+    public boolean delFollow(String token, Integer friendId) {
+        if (StrJudgeUtil.isCorrectInt(friendId)) {
+            UserBean userBean = this.findUserByToken(token);
+            try {
+                int res = userFriendsDao.deleteUserFriend(userBean.getUserId(), friendId);
+                if (res > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+        return false;
     }
 }

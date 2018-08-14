@@ -34,7 +34,6 @@
             <result property="headimgUrl" column="headimg_url"/>
         </association>
     </resultMap>
-
     <select id="queryFriendByIdAndType" resultType="com.haoge.shijie.pojo.UserBean">
         SELECT
         u.*
@@ -42,6 +41,14 @@
        Tb_user u,Tb_userfriendes f
         WHERE f.user_id=#{userId} AND f.friend_type=#{friendType}  AND f.friend_id=u.user_id
     </select>
+    <select id="queryFriendCount" resultType="int">
+     SELECT
+    count(*)
+    FROM
+    Tb_userfriendes f
+    WHERE f.user_id IN (#{userId},#{friendId}) AND f.friend_id IN (#{userId},#{friendId})
+    </select>
+
     <insert id="insertUserFriend" useGeneratedKeys="true" keyProperty="id"
             keyColumn="id" parameterType="com.haoge.shijie.pojo.UserFriendsBean">
            INSERT INTO
@@ -60,6 +67,8 @@
     </update>
     <delete id="deleteUserFriend">
         DELETE FROM Tb_userfriendes
-        WHERE user_id=#{userId} AND friendId=#{friendId}
+        WHERE
+        user_id IN(#{userId},#{friendId}) AND
+        friend_id IN(#{userId},#{friendId})
     </delete>
 </mapper>
