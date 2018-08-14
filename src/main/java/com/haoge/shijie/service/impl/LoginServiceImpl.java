@@ -8,9 +8,12 @@ import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.JWTUtil;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
+@CacheConfig(cacheNames = {"loginCache"})
 public class LoginServiceImpl implements LoginService {
     @Autowired
     private LoginDao loginDao;
@@ -18,6 +21,7 @@ public class LoginServiceImpl implements LoginService {
     private UserService userService;
 
     @Override
+    @Cacheable
     public UserBean findUserByName(String userName) {
         UserBean userBean = null;
         if (userName.equals("") || userName == null) {
@@ -34,6 +38,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
+    @Cacheable
     public ResponseBean getToken(String userName, String userPassword) {
         UserBean user = null;
         if ((!userName.equals("") && userName != null) &&

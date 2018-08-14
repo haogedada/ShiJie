@@ -7,12 +7,16 @@ import com.haoge.shijie.service.CommentatorService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@CacheConfig(cacheNames = {"comment"})
 public class CommentatorServiceImpl implements CommentatorService {
     @Autowired
     private CommentatorDao commentatorDao;
@@ -41,6 +45,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      * @return
      */
     @Override
+    @Cacheable
     public List<CommentatorBean> findCommByVdoIds(Integer toVideoId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId)) {
             List<CommentatorBean> commentatorBeans = commentatorDao.queryCommByVdoIds(toVideoId);
@@ -62,6 +67,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      * @return
      */
     @Override
+    @Cacheable
     public List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toUserId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId) && StrJudgeUtil.isCorrectInt(toUserId)) {
             List<CommentatorBean> commentatorBeans = commentatorDao.queryByVdoIdAndTuds(toVideoId, toUserId);
@@ -82,6 +88,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      * @return
      */
     @Override
+    @Cacheable
     public int findCountByVdoId(Integer toVideoId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId)) {
             int count = commentatorDao.queryCountByVdoId(toVideoId);
@@ -102,9 +109,10 @@ public class CommentatorServiceImpl implements CommentatorService {
      * @return
      */
     @Override
-    public int findCountByUserId(Integer toUserId) {
+    @Cacheable
+    public int findCountByAndVidUid(Integer toVideoId, Integer toUserId) {
         if (StrJudgeUtil.isCorrectInt(toUserId)) {
-            int count = commentatorDao.queryCountByUserId(toUserId);
+            int count = commentatorDao.queryCountByVidAndUid(toVideoId, toUserId);
             if (count >= 0) {
                 return count;
             } else {
@@ -201,6 +209,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "comment", allEntries = true)
     public boolean modifyCommentator(CommentatorBean commentator) {
         if (commentator != null && StrJudgeUtil.isCorrectInt(commentator.getToVideoId())) {
             try {
@@ -226,6 +235,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "comment", allEntries = true)
     public boolean delCommentator(Integer txtId) {
         if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {
@@ -253,6 +263,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "comment", allEntries = true)
     public boolean modifyCommentTop(Integer txtId, String token) {
         if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {
@@ -279,6 +290,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "comment", allEntries = true)
     public boolean modifyCommentTrample(Integer txtId, String token) {
         if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {

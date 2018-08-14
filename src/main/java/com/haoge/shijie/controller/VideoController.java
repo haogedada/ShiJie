@@ -71,12 +71,17 @@ public class VideoController {
                                     @RequestParam("content") String videoContent,
                                     @RequestParam("coverfile") MultipartFile coverFile,
                                     HttpServletRequest request) {
-        VideoBean videoBean = new VideoBean();
-        videoBean.setVideoId(videoId);
-        videoBean.setVideoTitle(videoTitle);
-        videoBean.setVideoContent(videoContent);
-        String filePath = request.getServletContext().getRealPath(UPLOADPATH);
-        boolean success = videoService.modifyVideo(videoBean, token, filePath, coverFile);
+        boolean success = false;
+        if (coverFile.getSize() <= 0) {
+            success = videoService.modifyVideo(request);
+        } else {
+            VideoBean videoBean = new VideoBean();
+            videoBean.setVideoId(videoId);
+            videoBean.setVideoTitle(videoTitle);
+            videoBean.setVideoContent(videoContent);
+            String filePath = request.getServletContext().getRealPath(UPLOADPATH);
+            success = videoService.modifyVideo(videoBean, token, filePath, coverFile);
+        }
         if (success) {
             return new ResponseBean().successMethod();
         } else {

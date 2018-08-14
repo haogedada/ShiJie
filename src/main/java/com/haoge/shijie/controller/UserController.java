@@ -21,10 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    /**
-     * Log4j日志处理
-     */
-    //private static final Logger log = Logger.getLogger(UserController.class);
+
     //返回用户个人信息 通过token
     @GetMapping("/user")
     @RequiresAuthentication
@@ -92,7 +89,7 @@ public class UserController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean backFansList(@RequestHeader("Authorization") String token) {
-        List<UserBean> fansList = userService.goFriendList(token, Constants.friendType.FOLLOW.getName());
+        List<UserBean> fansList = userService.goFriendList(token, Constants.friendType.FANS.getName());
         return new ResponseBean().successMethod(fansList);
     }
 

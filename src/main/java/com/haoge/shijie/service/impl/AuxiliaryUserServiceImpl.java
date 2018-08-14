@@ -6,6 +6,7 @@ import com.haoge.shijie.service.AuxiliaryUserService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +30,12 @@ public class AuxiliaryUserServiceImpl implements AuxiliaryUserService {
     }
 
     @Override
+    @Cacheable(value = "loginCache")
     public AuxiliaryUserBean findAuxiliaryUserById(Integer userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             AuxiliaryUserBean bean = auxiliaryUserDao.queryAuxiliaryUserById(userId);
             if (bean == null) {
-                throw new RuntimeException("不存在改用户信息");
+                throw new RuntimeException("不存在该用户信息");
             } else {
                 return bean;
             }
@@ -127,9 +129,9 @@ public class AuxiliaryUserServiceImpl implements AuxiliaryUserService {
             AuxiliaryUserBean auxiliaryUser = null;
             if ((System.currentTimeMillis() - ((Long.valueOf(codeTime) / 609218) + 19970715)) < (1000) * 60 * 60 * 2) {
                 try {
-                    auxiliaryUser = findAuxUserByCode(code);
+                    auxiliaryUser = this.findAuxUserByCode(code);
                     auxiliaryUser.setUserCode("-1");
-                    boolean res = modifyAuxiliaryUser(auxiliaryUser);
+                    boolean res = this.modifyAuxiliaryUser(auxiliaryUser);
                     if (res) {
                         return true;
                     } else {
@@ -141,7 +143,7 @@ public class AuxiliaryUserServiceImpl implements AuxiliaryUserService {
             } else {
                 try {
                     auxiliaryUser = findAuxUserByCode(code);
-                    boolean res = delAuxiliaryUser(auxiliaryUser.getUserId());
+                    boolean res = this.delAuxiliaryUser(auxiliaryUser.getUserId());
                     if (res) {
                         boolean ures = userService.delUser(auxiliaryUser.getUserId());
                         if (ures) {

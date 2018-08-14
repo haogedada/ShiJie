@@ -10,6 +10,11 @@ import com.haoge.shijie.service.FileService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +28,7 @@ import static com.haoge.shijie.constant.Constants.roleType.USERROLE;
 import static com.haoge.shijie.constant.Constants.urlType.HEADURL;
 
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserDao userDao;
@@ -36,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private AuxiliaryUserDao auxiliaryUserDao;
     @Autowired
     private FileService fileService;
+
 
     /**
      * 用户列表
@@ -59,6 +66,7 @@ public class UserServiceImpl implements UserService {
      * @return userBean 用户信息
      */
     @Override
+    @Cacheable(value = "userCache")
     public UserBean findUserById(Integer userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             UserBean userBean = userDao.queryUserById(userId);
@@ -79,10 +87,12 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Cacheable(value = "userCache")
     public UserBean findUserAndAuxById(Integer userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             UserBean userBean = userDao.queryUserAndAuxById(userId);
-            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
+            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName()) &&
+                    userBean.getAuxiliaryUserBean() != null) {
                 return userBean;
             } else {
                 throw new RuntimeException("findUserAndAuxById错误");
@@ -100,6 +110,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Cacheable(value = "userCache")
     public UserBean findUserByToken(String token) {
         String userName = JWTUtil.getUsername(token);
         UserBean userBean = userDao.queryUserByName(userName);
@@ -112,15 +123,16 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 通过token查找用户相关信息
+     * 通过token查找用户自己相关信息
      *
      * @param token
      * @return
      */
     @Override
+    @Cacheable(value = "userAndVideo")
     public UserHomeBean goUserHomeByToken(String token) {
         UserHomeBean userHome = new UserHomeBean();
-        UserBean userBean = findUserByToken(token);
+        UserBean userBean = this.findUserByToken(token);
         int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FANS.getName()).size();
         int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName()).size();
         List<VideoBean> videos = videoDao.queryVideosByUid(userBean.getUserId());
@@ -197,30 +209,6 @@ public class UserServiceImpl implements UserService {
      * 修改用户信息
      *
      * @param userBean
-     * @return
-     */
-    public boolean modifyUser(UserBean userBean) {
-        if (StrJudgeUtil.isCorrectInt(userBean.getUserId()) && userBean != null) {
-            try {
-                int res = userDao.updateUser(userBean);
-                if (res > 0) {
-                    return true;
-                } else {
-                    throw new RuntimeException("修改信息失败");
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
-            }
-
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 修改用户信息
-     *
-     * @param userBean
      * @param token
      * @param file
      * @param filePath
@@ -228,6 +216,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "userCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true),
+            @CacheEvict(value = "userAndFriend", allEntries = true)
+    })
     public boolean modifyUser(UserBean userBean, String token, MultipartFile file, String filePath) {
         if (StrJudgeUtil.isCorrectStr(userBean.getUserNickname()) &&
                 StrJudgeUtil.isCorrectStr(userBean.getUserSex()) &&
@@ -239,7 +232,7 @@ public class UserServiceImpl implements UserService {
             String[] filesName = null;
             if (FileUtil.isImageFile(fileType)) {
                 String ext = FileUtil.fileTypeConvert(fileType);
-                UserBean userBean1 = findUserByToken(token);
+                UserBean userBean1 = this.findUserByToken(token);
                 String fileName = HEADIMGPREFIX.getName() + userBean1.getUserId() + ext;
                 filesName = new String[]{fileName};
                 userBean1.setUserNickname(userBean.getUserNickname());
@@ -249,8 +242,8 @@ public class UserServiceImpl implements UserService {
                 userBean1.setUserBirthday(userBean.getUserBirthday());
                 try {
                     boolean success = fileService.upLoadFile(files, filesPath, filesName);
-                    boolean res = modifyUser(userBean1);
-                    if (res && success) {
+                    int res = userDao.updateUser(userBean1);
+                    if (res > 0 && success) {
                         return true;
                     } else {
                         return false;
@@ -274,6 +267,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "userCache", allEntries = true),
+            @CacheEvict(value = "collAndvideoAndUser", allEntries = true),
+            @CacheEvict(value = "userAndFriend", allEntries = true),
+    })
     public boolean delUser(Integer userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             try {
@@ -292,6 +291,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * !!!!!注意在进行添加和删除好友后要将缓存清空
      * 获取用户朋友列表
      *
      * @param token
@@ -299,8 +299,9 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Cacheable(value = "userAndFriend")
     public List<UserBean> goFriendList(String token, String friendType) {
-        UserBean userBean = findUserByToken(token);
+        UserBean userBean = this.findUserByToken(token);
         List<UserBean> friends = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), friendType);
         for (UserBean user : friends) {
             user.setUserPassword("");
@@ -312,17 +313,22 @@ public class UserServiceImpl implements UserService {
 
     //用户收藏集合
     @Override
+    @Cacheable(value = "collAndvideoAndUser")
     public List<VideoBean> goCollectionList(String token) {
-        UserBean userBean = findUserByToken(token);
+        UserBean userBean = this.findUserByToken(token);
         List<VideoBean> videos = collectionDao.queryCollectionByUid(userBean.getUserId());
         return videos;
     }
 
-    //用户主页
+    //其他用户主页
     @Override
+    @Cacheable(value = "userAndVideo")
     public UserHomeBean goUserHomeByUid(Integer userId) {
         UserHomeBean userHome = new UserHomeBean();
-        UserBean userBean = findUserById(userId);
+        if (!StrJudgeUtil.isCorrectInt(userId)) {
+            throw new RuntimeException("参数不合法");
+        }
+        UserBean userBean = userDao.queryUserById(userId);
         int fansNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FANS.getName()).size();
         int followNum = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName()).size();
         List<VideoBean> videos = videoDao.queryVideosByUid(userBean.getUserId());
@@ -337,7 +343,8 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-     * 修改密码验证码由时间戳和随机码构成，通过切割分别获取到，然后进行比对
+     * 修改密码
+     * 验证码由时间戳和随机码构成，通过切割分别获取到，然后进行比对
      *
      * @param userName,code,password
      * @param code
@@ -346,6 +353,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "loginCache", allEntries = true)
     public boolean modifyPassword(String userName, String code, String password) {
         UserBean userBean = userDao.queryUserByName(userName);
         if (userBean != null) {
@@ -383,6 +391,4 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("用户不存在");
         }
     }
-
-
 }

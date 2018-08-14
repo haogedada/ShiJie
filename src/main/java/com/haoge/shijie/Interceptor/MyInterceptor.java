@@ -16,8 +16,8 @@ import java.util.Date;
 @Component
 public class MyInterceptor implements HandlerInterceptor {
 
-    //距离token失效时间，小于这个时间，重新获取token
-    private static final long SHIXIAOTIME = 25 * 60 * 1000;
+    //token失效的5分钟内进行提示
+    private static final long SHIXIAOTIME = 5 * 60 * 1000;
     @Autowired
     private LoginService loginService;
 
@@ -41,7 +41,7 @@ public class MyInterceptor implements HandlerInterceptor {
             // 解密获得date，用于和当前时间进行对比
             Date tokenTime = JWTUtil.getTokenDate(token);
             //token即将失效，提示前端自己重新获取一个新的token
-            if (System.currentTimeMillis() - tokenTime.getTime() >= SHIXIAOTIME) {
+            if ((tokenTime.getTime() - System.currentTimeMillis()) <= SHIXIAOTIME) {
                 String userName = JWTUtil.getUsername(token);
                 UserBean userBean = loginService.findUserByName(userName);
                 if (userBean != null && userBean.getUserName() != null) {

@@ -40,10 +40,10 @@ public interface CommentatorDao {
     /**
      * 根据UserId查询该视频的评论者的评论数
      *
-     * @param toUserId
+     * @param toVideoId,toUserId
      * @return
      */
-    int queryCountByUserId(Integer toUserId);
+    int queryCountByVidAndUid(Integer toVideoId, Integer toUserId);
 
 
     /**

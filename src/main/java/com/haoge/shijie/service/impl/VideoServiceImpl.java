@@ -10,6 +10,10 @@ import com.haoge.shijie.util.DateUtil;
 import com.haoge.shijie.util.FileUtil;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +27,7 @@ import static com.haoge.shijie.constant.Constants.prefixType.VIDEOPREFIX;
 import static com.haoge.shijie.constant.Constants.urlType.VIDEOCOVERURL;
 import static com.haoge.shijie.constant.Constants.urlType.VIDEOURL;
 
+@CacheConfig(cacheNames = {"videoCache"})
 @Service
 public class VideoServiceImpl implements VideoService {
 
@@ -42,6 +47,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
+    })
     public boolean modifyVideo(HttpServletRequest request) {
         Integer videoId = Integer.valueOf(request.getParameter("videoId"));
         String title = request.getParameter("title");
@@ -51,7 +60,7 @@ public class VideoServiceImpl implements VideoService {
                 StrJudgeUtil.isCorrectStr(title) &&
                 StrJudgeUtil.isCorrectStr(content)) {
             UserBean userBean = userService.findUserByToken(token);
-            VideoBean videoBean = findVideoByVid(videoId);
+            VideoBean videoBean = this.findVideoByVid(videoId);
             if (userBean.getUserId() == videoBean.getUserId()) {
                 try {
                     videoBean.setVideoTitle(title);
@@ -85,6 +94,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
+    })
     public boolean modifyVideo(VideoBean videoBean, String token, String filePath, MultipartFile coverFile) {
         if (StrJudgeUtil.isCorrectInt(videoBean.getVideoId()) &&
                 StrJudgeUtil.isCorrectStr(videoBean.getVideoTitle()) &&
@@ -125,7 +138,14 @@ public class VideoServiceImpl implements VideoService {
         return false;
     }
 
+    /**
+     * 根据视频id查找视频
+     *
+     * @param videoId
+     * @return
+     */
     @Override
+    @Cacheable
     public VideoBean findVideoByVid(Integer videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             VideoBean videoBean = videoDao.queryVideoByVid(videoId);
@@ -148,6 +168,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
+    })
     public boolean delVideoByVid(String token, Integer videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             UserBean userBean = userService.findUserByToken(token);
@@ -258,6 +282,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
+    })
     public boolean modifyVideoPlayCount(Integer VideoId, String token) {
         if (StrJudgeUtil.isCorrectInt(VideoId)) {
             try {
@@ -284,6 +312,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
+    })
     public boolean modifyVideoTop(Integer VideoId, String token) {
         if (StrJudgeUtil.isCorrectInt(VideoId)) {
             try {
@@ -310,6 +342,10 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
+    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
+            @CacheEvict(value = "videoCache", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
+    })
     public boolean modifyVideoTrample(Integer VideoId, String token) {
         if (StrJudgeUtil.isCorrectInt(VideoId)) {
             try {
@@ -326,6 +362,4 @@ public class VideoServiceImpl implements VideoService {
             throw new RuntimeException("踩一下视频参数错误");
         }
     }
-
-
 }

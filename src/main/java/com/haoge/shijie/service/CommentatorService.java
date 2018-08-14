@@ -41,10 +41,10 @@ public interface CommentatorService {
     /**
      * 根据UserId查询该视频的评论者的评论数
      *
-     * @param toUserId
+     * @param toVideoId,toUserId
      * @return
      */
-    int findCountByUserId(Integer toUserId);
+    int findCountByAndVidUid(Integer toVideoId, Integer toUserId);
 
 
     /**

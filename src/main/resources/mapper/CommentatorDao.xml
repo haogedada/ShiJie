@@ -41,7 +41,7 @@
        WHERE
        t.to_video_id=#{toVideoId}
     </select>
-    <select id="queryCountByUserId" resultType="int">
+    <select id="queryCountByVidAndUid" resultType="int">
        SELECT
        COUNT(*) FROM Tb_commentator t
        WHERE

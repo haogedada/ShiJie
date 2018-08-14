@@ -119,7 +119,6 @@ public class InteractionController {
         return new ResponseBean().failMethod(50, "评论未知错误");
     }
 
-
     //顶一下评论
     @PutMapping("/comment/top/{txt_id}")
     @RequiresAuthentication

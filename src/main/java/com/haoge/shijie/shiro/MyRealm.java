@@ -41,13 +41,12 @@ public class MyRealm extends AuthorizingRealm {
     }
 
     /**
-     * 只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission之类的
+     * 只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission,管路员之类的
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         String username = JWTUtil.getUsername(principals.toString());
         UserBean user = loginService.findUserByName(username);
-
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         AuxiliaryUserBean auxiliaryUserBean = auxiliaryUserService.findAuxiliaryUserById(user.getUserId());
         simpleAuthorizationInfo.addRole(auxiliaryUserBean.getUserRole());

@@ -11,8 +11,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public class JWTUtil {
-    // 过期时间2小时
-    private static final long EXPIRE_TIME = 120 * 60 * 1000;
+    // 过期时间30分钟
+    private static final long EXPIRE_TIME = 1000 * 60 * 120;
 
     /**
      * 校验token是否正确
