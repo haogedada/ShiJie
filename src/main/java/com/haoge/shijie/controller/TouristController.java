@@ -2,7 +2,6 @@ package com.haoge.shijie.controller;
 
 
 import com.haoge.shijie.annotation.SerializedField;
-import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.Paging;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.VideoService;
@@ -29,13 +28,12 @@ public class TouristController {
         Paging paging = videoService.searchVideos(pageIndex, pageSize, content);
         return new ResponseBean().successMethod(paging);
     }
-
     //按视频分类显示
     @GetMapping("/videoType/{pageIndex}&&{pageSize}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean videoByType(@PathVariable("pageIndex") Integer pageIndex,
-                               @PathVariable("pageSize") Integer pageSize,
-                               @RequestParam("videoType") String videoType) {
+                                    @PathVariable("pageSize") Integer pageSize,
+                                    @RequestParam("videoType") String videoType) {
         Paging paging = videoService.showByType(pageIndex, pageSize, videoType);
         return new ResponseBean().successMethod(paging);
     }

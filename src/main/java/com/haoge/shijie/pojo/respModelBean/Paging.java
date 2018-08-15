@@ -6,9 +6,10 @@ public class Paging {
     private Integer tatolPage;
     private Object list;
 
-    public Paging(){
+    public Paging() {
 
     }
+
     public Paging(Integer indexPage, Integer tatolPage, Object list) {
         this.indexPage = indexPage;
         this.tatolPage = tatolPage;

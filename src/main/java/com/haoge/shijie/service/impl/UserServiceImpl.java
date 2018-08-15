@@ -272,7 +272,7 @@ public class UserServiceImpl implements UserService {
     @Caching(evict = {
             @CacheEvict(value = "userAndVideo", allEntries = true),
             @CacheEvict(value = "userCache", allEntries = true),
-            @CacheEvict(value = "collAndvideoAndUser", allEntries = true),
+            @CacheEvict(value = "collAndVideoAndUser", allEntries = true),
             @CacheEvict(value = "userAndFriend", allEntries = true),
             @CacheEvict(value = "videoCache", allEntries = true)
     })
@@ -315,7 +315,7 @@ public class UserServiceImpl implements UserService {
 
     //用户收藏集合
     @Override
-    @Cacheable(value = "collAndvideoAndUser")
+    @Cacheable(value = "collAndVideoAndUser")
     public List<VideoBean> goCollectionList(String token) {
         UserBean userBean = this.findUserByToken(token);
         List<VideoBean> videos = collectionDao.queryCollectionByUid(userBean.getUserId());

@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 import static com.haoge.shijie.constant.Constants.pathType.VIDEOCOVERPATH;
@@ -311,6 +310,7 @@ public class VideoServiceImpl implements VideoService {
 
     /**
      * 搜索视频
+     *
      * @param pageIndex
      * @param pageSize
      * @param content
@@ -319,23 +319,23 @@ public class VideoServiceImpl implements VideoService {
     @Override
     @Cacheable(value = "userAndVideo")
     public Paging searchVideos(Integer pageIndex, Integer pageSize, String content) {
-        if(StrJudgeUtil.isCorrectInt(pageIndex)&&
-           StrJudgeUtil.isCorrectInt(pageSize)&&
-           StrJudgeUtil.isCorrectStr(content)){
-            int count=videoDao.queryCountByAll(content);
-            int totalPage=(count+pageSize-1)/pageSize;
-            if(count>0) {
-                if (pageIndex<1){
-                    pageIndex=1;
-                }else if (totalPage<pageIndex){
-                  pageIndex = totalPage;
+        if (StrJudgeUtil.isCorrectInt(pageIndex) &&
+                StrJudgeUtil.isCorrectInt(pageSize) &&
+                StrJudgeUtil.isCorrectStr(content)) {
+            int count = videoDao.queryCountByAll(content);
+            int totalPage = (count + pageSize - 1) / pageSize;
+            if (count > 0) {
+                if (pageIndex < 1) {
+                    pageIndex = 1;
+                } else if (totalPage < pageIndex) {
+                    pageIndex = totalPage;
                 }
-                List<VideoBean> videos = videoDao.queryVideosByAll(content, (pageIndex-1)*pageSize, pageSize);
-                return new Paging(pageIndex,totalPage,videos);
-            }else {
+                List<VideoBean> videos = videoDao.queryVideosByAll(content, (pageIndex - 1) * pageSize, pageSize);
+                return new Paging(pageIndex, totalPage, videos);
+            } else {
                 throw new RuntimeException("搜索不到视频");
             }
-        }else {
+        } else {
             throw new RuntimeException("参数不合法");
         }
     }
@@ -343,26 +343,26 @@ public class VideoServiceImpl implements VideoService {
     @Override
     @Cacheable(value = "userAndVideo")
     public Paging showByType(Integer pageIndex, Integer pageSize, String videoType) {
-        if(StrJudgeUtil.isCorrectInt(pageIndex)&&
-                StrJudgeUtil.isCorrectInt(pageSize)&&
-                StrJudgeUtil.isCorrectStr(videoType)){
-            if (!Constants.videoType.isValueOf(videoType)){
+        if (StrJudgeUtil.isCorrectInt(pageIndex) &&
+                StrJudgeUtil.isCorrectInt(pageSize) &&
+                StrJudgeUtil.isCorrectStr(videoType)) {
+            if (!Constants.videoType.isValueOf(videoType)) {
                 throw new RuntimeException("没有该分类");
             }
-            int count=videoDao.queryCountByType(videoType);
-            int totalPage=(count+pageSize-1)/pageSize;
-            if(count>0) {
-                if (pageIndex<1){
-                    pageIndex=1;
-                }else if (totalPage<pageIndex){
+            int count = videoDao.queryCountByType(videoType);
+            int totalPage = (count + pageSize - 1) / pageSize;
+            if (count > 0) {
+                if (pageIndex < 1) {
+                    pageIndex = 1;
+                } else if (totalPage < pageIndex) {
                     pageIndex = totalPage;
                 }
-                List<VideoBean> videos = videoDao.queryVideosByType(videoType, (pageIndex-1)*pageSize, pageSize);
-                return new Paging(pageIndex,totalPage,videos);
-            }else {
+                List<VideoBean> videos = videoDao.queryVideosByType(videoType, (pageIndex - 1) * pageSize, pageSize);
+                return new Paging(pageIndex, totalPage, videos);
+            } else {
                 throw new RuntimeException("该分类没有视频");
             }
-        }else {
+        } else {
             throw new RuntimeException("参数不合法");
         }
     }

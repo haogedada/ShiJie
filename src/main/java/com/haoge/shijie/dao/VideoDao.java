@@ -53,10 +53,12 @@ public interface VideoDao {
 
     /**
      * 搜索的总条数
+     *
      * @param keyword
      * @return
      */
-     int queryCountByAll(@Param("keyword") String keyword);
+    int queryCountByAll(@Param("keyword") String keyword);
+
     /**
      * 查询最后插入的视频
      *

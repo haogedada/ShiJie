@@ -185,6 +185,15 @@ public class Constants {
             this.value = value;
         }
 
+        public static boolean isValueOf(String type) {
+            for (int i = 0; i < values().length; i++) {
+                if (values()[i].getName().equals(type)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public Integer getIndex() {
             return index;
         }
@@ -195,15 +204,6 @@ public class Constants {
 
         public String getValue() {
             return value;
-        }
-
-        public static boolean isValueOf(String type) {
-            for (int i=0;i<values().length;i++) {
-                if (values()[i].getName().equals(type)) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 

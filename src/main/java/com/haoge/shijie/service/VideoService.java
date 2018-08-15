@@ -5,7 +5,6 @@ import com.haoge.shijie.pojo.respModelBean.Paging;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 public interface VideoService {
 
@@ -82,6 +81,7 @@ public interface VideoService {
 
     /**
      * 搜索视频
+     *
      * @param pageIndex
      * @param pageSize
      * @param content
@@ -91,6 +91,7 @@ public interface VideoService {
 
     /**
      * 按视频分类显示
+     *
      * @param pageIndex
      * @param pageSize
      * @param videoType

@@ -29,7 +29,10 @@ public class DataConnConfig {
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setUser(jdbcUsername);
         dataSource.setPassword(jdbcPassword);
-        //关闭连接后不自动瓜关闭
+        //解决mysql连接超时
+        dataSource.setTestConnectionOnCheckin(false);
+        dataSource.setTestConnectionOnCheckout(true);
+        //关闭连接后不自动关闭
         dataSource.setAutoCommitOnClose(false);
         return dataSource;
     }
