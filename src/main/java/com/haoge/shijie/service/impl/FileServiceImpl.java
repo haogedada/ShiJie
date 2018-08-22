@@ -53,4 +53,20 @@ public class FileServiceImpl implements FileService {
         }
         return false;
     }
+
+    /**
+     * 删除文件
+     * @param fileUrl
+     * @return
+     */
+    @Override
+    public boolean deleteFile(String filePath,String fileUrl) {
+        //获取文件名字
+        String fileName=fileUrl.substring(fileUrl.lastIndexOf("/")+1);
+        boolean isDelete=FileUtil.deleteFile(filePath+fileName);
+        if (isDelete){
+            return true;
+        }
+        return false;
+    }
 }

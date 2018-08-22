@@ -232,4 +232,18 @@ public class FileUtil {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    /**
+     * 删除文件
+     * @param filePath
+     */
+    public static boolean deleteFile(String filePath){
+        File file=new File(filePath);
+        if (file.exists()){
+            file.delete();
+            return true;
+        }
+        return false;
+    }
+
 }

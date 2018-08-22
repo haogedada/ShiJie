@@ -15,4 +15,9 @@ public interface FileService {
      */
     boolean upLoadFile(MultipartFile[] file, String[] filePath, String[] fileName) throws Exception;
 
+
+    /**
+     * 删除文件
+     */
+    boolean deleteFile(String filePath,String fileUrl);
 }

@@ -77,19 +77,20 @@ public class InteractionController {
         }
         return new ResponseBean().failMethod(500, "修改播放量未知错误");
     }
+
     //获取所有视频分类
     @GetMapping("/video/allVideoType")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean getAllVideoType() {
-        List videoTypes=new ArrayList();
-        Constants.videoType [] videoTypeArr=Constants.videoType.values();
+        List videoTypes = new ArrayList();
+        Constants.videoType[] videoTypeArr = Constants.videoType.values();
         for (int i = 0; i < videoTypeArr.length; i++) {
-            videoTypes.add(videoTypeArr[i].getName()+":"+videoTypeArr[i].getValue());
+            videoTypes.add(videoTypeArr[i].getName() + ":" + videoTypeArr[i].getValue());
         }
-        if (videoTypes.size()>0){
+        if (videoTypes.size() > 0) {
             return new ResponseBean().successMethod(videoTypes);
-        }else {
-            return new ResponseBean().failMethod(500,"获取视频分类列表失败");
+        } else {
+            return new ResponseBean().failMethod(500, "获取视频分类列表失败");
         }
 
     }

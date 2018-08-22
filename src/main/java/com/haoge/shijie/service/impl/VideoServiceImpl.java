@@ -58,14 +58,14 @@ public class VideoServiceImpl implements VideoService {
         Integer videoId = Integer.valueOf(request.getParameter("videoId"));
         String title = request.getParameter("title");
         String content = request.getParameter("content");
-        String type=request.getParameter("type");
+        String type = request.getParameter("type");
         String token = request.getHeader("Authorization");
         if (StrJudgeUtil.isCorrectInt(videoId) &&
                 StrJudgeUtil.isCorrectStr(title) &&
-                StrJudgeUtil.isCorrectStr(content)&&
+                StrJudgeUtil.isCorrectStr(content) &&
                 StrJudgeUtil.isCorrectStr(type)) {
-           Constants.videoType videoType = Constants.videoType.getVideoType(type);
-            if(videoType==null){
+            Constants.videoType videoType = Constants.videoType.getVideoType(type);
+            if (videoType == null) {
                 throw new RuntimeException("不存在该视频分类");
             }
             UserBean userBean = userService.findUserByToken(token);
@@ -74,7 +74,7 @@ public class VideoServiceImpl implements VideoService {
                 try {
                     videoBean.setVideoTitle(title);
                     videoBean.setVideoContent(content);
-                    videoBean.setVideoType(videoType.getName()+"|"+videoType.getValue());
+                    videoBean.setVideoType(videoType.getName() + "|" + videoType.getValue());
                     int res = videoDao.updateVideo(videoBean);
                     if (res > 0) {
                         return true;
@@ -111,14 +111,18 @@ public class VideoServiceImpl implements VideoService {
     public boolean modifyVideo(VideoBean videoBean, String token, String filePath, MultipartFile coverFile) {
         if (StrJudgeUtil.isCorrectInt(videoBean.getVideoId()) &&
                 StrJudgeUtil.isCorrectStr(videoBean.getVideoTitle()) &&
-                StrJudgeUtil.isCorrectStr(videoBean.getVideoContent())&&
+                StrJudgeUtil.isCorrectStr(videoBean.getVideoContent()) &&
                 StrJudgeUtil.isCorrectStr(videoBean.getVideoType())) {
-            Constants.videoType videoType=Constants.videoType.getVideoType(videoBean.getVideoType());
-          if(videoType==null){
-              throw new RuntimeException("不存在该视频分类");
-          }
+            Constants.videoType videoType = Constants.videoType.getVideoType(videoBean.getVideoType());
+            if (videoType == null) {
+                throw new RuntimeException("不存在该视频分类");
+            }
             UserBean userBean = userService.findUserByToken(token);
             VideoBean videoBean1 = findVideoByVid(videoBean.getVideoId());
+            boolean isDelete=fileService.deleteFile(filePath + VIDEOCOVERPATH.getName(),videoBean1.getVideoCoverUrl());
+            if(!isDelete){
+                throw new RuntimeException("操作失败");
+            }
             if (userBean.getUserId() == videoBean1.getUserId()) {
                 String[] coversPath = new String[]{filePath + VIDEOCOVERPATH.getName()};
                 MultipartFile[] coversFile = new MultipartFile[]{coverFile};
@@ -131,7 +135,7 @@ public class VideoServiceImpl implements VideoService {
                         videoBean1.setVideoTitle(videoBean.getVideoTitle());
                         videoBean1.setVideoContent(videoBean.getVideoContent());
                         videoBean1.setVideoCoverUrl(coverName);
-                        videoBean1.setVideoType(videoType.getName()+"|"+videoType.getValue());
+                        videoBean1.setVideoType(videoType.getName() + "|" + videoType.getValue());
                         boolean success = fileService.upLoadFile(coversFile, coversPath, coversName);
                         int res = videoDao.updateVideo(videoBean1);
                         if (res > 0 && success) {
@@ -239,61 +243,61 @@ public class VideoServiceImpl implements VideoService {
                 throw new RuntimeException("上传封面文件格式错误");
             }
         }
-       Constants.videoType videoType = Constants.videoType.getVideoType(video.getVideoType());
-        if (videoType==null){
+        Constants.videoType videoType = Constants.videoType.getVideoType(video.getVideoType());
+        if (videoType == null) {
             throw new RuntimeException("不存在该视频分类");
         }
         if (!StrJudgeUtil.isCorrectStr(video.getVideoTitle()) ||
-                !StrJudgeUtil.isCorrectStr(video.getVideoContent())||
+                !StrJudgeUtil.isCorrectStr(video.getVideoContent()) ||
                 !StrJudgeUtil.isCorrectStr(video.getVideoType())) {
-             throw new RuntimeException("参数不合法");
+            throw new RuntimeException("参数不合法");
         }
-            UserBean user = userService.findUserByToken(token);
-            Integer videoId = videoDao.queryVideoLastId();
-            if (StrJudgeUtil.isCorrectInt(videoId)) {
-                //根据videoType获取文件后缀名
-                String videoext = FileUtil.fileTypeConvert(fileType[0]);
-                String videoName = VIDEOPREFIX.getName() + user.getUserId() + "-" + videoId + videoext;
-                String coverName = null;
-                String[] filesName = null;
-                //判断用户是否上传封面，
-                if (file.length == 1 && fileType.length == 1) {
-                    coverName = COVERIMGPREFIX.getName() + videoId + ".jpg";
-                } else if (file.length == 2 && fileType.length == 2) {
-                    String coverext = FileUtil.fileTypeConvert(fileType[1]);
-                    coverName = COVERIMGPREFIX.getName() + videoId + coverext;
-                }
-                filesName = new String[]{videoName, coverName};
-                try {
-                    boolean success = fileService.upLoadFile(file, filesPath, filesName);
-                    if (success) {
-                        //获取视频时间并转换为时长制
-                        int time = FileUtil.getVideoTime(filesPath[0] + filesName[0]);
-                        String videoTime = DateUtil.secToTime(time);
-                        VideoBean videoBean = new VideoBean();
-                        videoBean.setUserId(user.getUserId());
-                        videoBean.setVideoTitle(video.getVideoTitle());
-                        videoBean.setVideoContent(video.getVideoContent());
-                        videoBean.setVideoType(videoType.getName()+"|"+videoType.getValue());
-                        videoBean.setPlayerCount(0);
-                        videoBean.setVideoTipNum(0);
-                        videoBean.setVideoTrampleNum(0);
-                        videoBean.setVideoUrl(VIDEOURL.getName() + videoName);
-                        videoBean.setVideoCoverUrl(VIDEOCOVERURL.getName() + coverName);
-                        videoBean.setVideoTime(videoTime);
-                        int res = videoDao.insertVideo(videoBean);
-                        if (res > 0) {
-                            return true;
-                        } else {
-                            throw new RuntimeException("插入视频失败");
-                        }
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException("上传文件出错" + e.getMessage());
-                }
+        UserBean user = userService.findUserByToken(token);
+        Integer videoId = videoDao.queryVideoLastId();
+        if (StrJudgeUtil.isCorrectInt(videoId)) {
+            //根据videoType获取文件后缀名
+            String videoext = FileUtil.fileTypeConvert(fileType[0]);
+            String videoName = VIDEOPREFIX.getName() + user.getUserId() + "-" + videoId + videoext;
+            String coverName = null;
+            String[] filesName = null;
+            //判断用户是否上传封面，
+            if (file.length == 1 && fileType.length == 1) {
+                coverName = COVERIMGPREFIX.getName() + videoId + ".jpg";
+            } else if (file.length == 2 && fileType.length == 2) {
+                String coverext = FileUtil.fileTypeConvert(fileType[1]);
+                coverName = COVERIMGPREFIX.getName() + videoId + coverext;
             }
+            filesName = new String[]{videoName, coverName};
+            try {
+                boolean success = fileService.upLoadFile(file, filesPath, filesName);
+                if (success) {
+                    //获取视频时间并转换为时长制
+                    int time = FileUtil.getVideoTime(filesPath[0] + filesName[0]);
+                    String videoTime = DateUtil.secToTime(time);
+                    VideoBean videoBean = new VideoBean();
+                    videoBean.setUserId(user.getUserId());
+                    videoBean.setVideoTitle(video.getVideoTitle());
+                    videoBean.setVideoContent(video.getVideoContent());
+                    videoBean.setVideoType(videoType.getName() + "|" + videoType.getValue());
+                    videoBean.setPlayerCount(0);
+                    videoBean.setVideoTipNum(0);
+                    videoBean.setVideoTrampleNum(0);
+                    videoBean.setVideoUrl(VIDEOURL.getName() + videoName);
+                    videoBean.setVideoCoverUrl(VIDEOCOVERURL.getName() + coverName);
+                    videoBean.setVideoTime(videoTime);
+                    int res = videoDao.insertVideo(videoBean);
+                    if (res > 0) {
+                        return true;
+                    } else {
+                        throw new RuntimeException("插入视频失败");
+                    }
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("上传文件出错" + e.getMessage());
+            }
+        }
         return false;
     }
 
@@ -361,6 +365,7 @@ public class VideoServiceImpl implements VideoService {
 
     /**
      * 视频分类分页显示
+     *
      * @param pageIndex
      * @param pageSize
      * @param videoType
@@ -372,11 +377,11 @@ public class VideoServiceImpl implements VideoService {
         if (StrJudgeUtil.isCorrectInt(pageIndex) &&
                 StrJudgeUtil.isCorrectInt(pageSize) &&
                 StrJudgeUtil.isCorrectStr(videoType)) {
-            Constants.videoType vt=Constants.videoType.getVideoType(videoType);
-            if (vt==null) {
+            Constants.videoType vt = Constants.videoType.getVideoType(videoType);
+            if (vt == null) {
                 throw new RuntimeException("没有该分类");
             }
-            String vt1=vt.getName()+"|"+vt.getValue();
+            String vt1 = vt.getName() + "|" + vt.getValue();
             int count = videoDao.queryCountByType(vt1);
             int totalPage = (count + pageSize - 1) / pageSize;
             if (count > 0) {

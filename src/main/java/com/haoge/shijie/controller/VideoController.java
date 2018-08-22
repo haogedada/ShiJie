@@ -30,7 +30,7 @@ public class VideoController {
                                     @RequestHeader("Authorization") String token,
                                     HttpServletRequest request) {
         String filePath = request.getServletContext().getRealPath(UPLOADPATH);
-        VideoBean videoBean=new VideoBean();
+        VideoBean videoBean = new VideoBean();
         videoBean.setVideoTitle(title);
         videoBean.setVideoContent(content);
         videoBean.setVideoType(type);
