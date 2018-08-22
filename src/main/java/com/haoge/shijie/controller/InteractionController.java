@@ -1,6 +1,7 @@
 package com.haoge.shijie.controller;
 
 import com.haoge.shijie.annotation.SerializedField;
+import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.pojo.CommentatorBean;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.CommentatorService;
@@ -9,6 +10,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +24,6 @@ public class InteractionController {
 
     //通过to_videoId获取视频所有评论（不包括子评论）
     @GetMapping("/comment/{toVideoId}")
-    @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean getComments(@PathVariable("toVideoId") Integer toVideoId) {
         List<CommentatorBean> commentators = service.findCommByVdoIds(toVideoId);
@@ -31,7 +32,6 @@ public class InteractionController {
 
     //通过to_videoId,to_userId获取视频所有子评论
     @GetMapping("/comment/{to_videoId}/{to_userId}")
-    @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean getCommentator(@PathVariable("to_videoId") Integer toVideoId,
                                        @PathVariable("to_userId") Integer toUserId) {
@@ -77,7 +77,22 @@ public class InteractionController {
         }
         return new ResponseBean().failMethod(500, "修改播放量未知错误");
     }
+    //获取所有视频分类
+    @GetMapping("/video/allVideoType")
+    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
+    public ResponseBean getAllVideoType() {
+        List videoTypes=new ArrayList();
+        Constants.videoType [] videoTypeArr=Constants.videoType.values();
+        for (int i = 0; i < videoTypeArr.length; i++) {
+            videoTypes.add(videoTypeArr[i].getName()+":"+videoTypeArr[i].getValue());
+        }
+        if (videoTypes.size()>0){
+            return new ResponseBean().successMethod(videoTypes);
+        }else {
+            return new ResponseBean().failMethod(500,"获取视频分类列表失败");
+        }
 
+    }
 
     //评论某个视频
     @PostMapping("/comment/{to_videoId}")
@@ -144,5 +159,4 @@ public class InteractionController {
         }
         return new ResponseBean().failMethod(500, "踩一下评论未知错误");
     }
-
 }

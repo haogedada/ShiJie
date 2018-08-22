@@ -185,15 +185,14 @@ public class Constants {
             this.value = value;
         }
 
-        public static boolean isValueOf(String type) {
+       public static videoType getVideoType(String typeName) {
             for (int i = 0; i < values().length; i++) {
-                if (values()[i].getName().equals(type)) {
-                    return true;
+                if (values()[i].getName().equals(typeName)) {
+                    return values()[i];
                 }
             }
-            return false;
+          return null;
         }
-
         public Integer getIndex() {
             return index;
         }

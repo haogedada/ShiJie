@@ -26,10 +26,15 @@ public class VideoController {
     public ResponseBean upLoadVideo(@RequestParam("file") MultipartFile[] file,
                                     @RequestParam("title") String title,
                                     @RequestParam("content") String content,
+                                    @RequestParam("type") String type,
                                     @RequestHeader("Authorization") String token,
                                     HttpServletRequest request) {
         String filePath = request.getServletContext().getRealPath(UPLOADPATH);
-        boolean success = videoService.addVideo(title, content, token, file, filePath);
+        VideoBean videoBean=new VideoBean();
+        videoBean.setVideoTitle(title);
+        videoBean.setVideoContent(content);
+        videoBean.setVideoType(type);
+        boolean success = videoService.addVideo(videoBean, token, file, filePath);
         //String fileName = file.getOriginalFilename();
         if (success) {
             return new ResponseBean().successMethod();
@@ -62,13 +67,14 @@ public class VideoController {
     }
 
     //修改视频
-    @PutMapping("/user/video")
+    @PostMapping("/user/modifyVideo")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean modifyVideo(@RequestHeader("Authorization") String token,
                                     @RequestParam("videoId") Integer videoId,
                                     @RequestParam("title") String videoTitle,
                                     @RequestParam("content") String videoContent,
+                                    @RequestParam("type") String videoType,
                                     @RequestParam("coverfile") MultipartFile coverFile,
                                     HttpServletRequest request) {
         boolean success = false;
@@ -79,6 +85,7 @@ public class VideoController {
             videoBean.setVideoId(videoId);
             videoBean.setVideoTitle(videoTitle);
             videoBean.setVideoContent(videoContent);
+            videoBean.setVideoType(videoType);
             String filePath = request.getServletContext().getRealPath(UPLOADPATH);
             success = videoService.modifyVideo(videoBean, token, filePath, coverFile);
         }

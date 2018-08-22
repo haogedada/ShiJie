@@ -28,6 +28,7 @@ public class TouristController {
         Paging paging = videoService.searchVideos(pageIndex, pageSize, content);
         return new ResponseBean().successMethod(paging);
     }
+
     //按视频分类显示
     @GetMapping("/videoType/{pageIndex}&&{pageSize}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})

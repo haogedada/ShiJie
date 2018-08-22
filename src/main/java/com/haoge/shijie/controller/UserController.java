@@ -32,7 +32,7 @@ public class UserController {
     }
 
     //用户信息修改
-    @PutMapping("/user")
+    @PostMapping("/modifyUser")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean modifyUser(@RequestParam("nickname") String nickName,
@@ -94,11 +94,11 @@ public class UserController {
     }
 
     //添加关注
-    @PutMapping("/user/follow/{friendId}")
+    @PutMapping("/user/follow/{userId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean addFollow(@RequestHeader("Authorization") String token,
-                                  @PathVariable("friendId") Integer friendId) {
+                                  @PathVariable("userId") Integer friendId) {
         boolean success = userService.addFollow(token, friendId);
         if (success) {
             return new ResponseBean().successMethod();

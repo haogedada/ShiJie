@@ -11,10 +11,10 @@ public interface VideoService {
     /**
      * 插入视频记录
      *
-     * @param title,content,token
+     * @param video,content,token
      * @return
      */
-    boolean addVideo(String title, String content, String token, MultipartFile[] file, String filePath);
+    boolean addVideo(VideoBean video, String token, MultipartFile[] file, String filePath);
 
     /**
      * 删除视频
