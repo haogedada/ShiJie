@@ -1,6 +1,8 @@
 package com.haoge.shijie.pojo.respModelBean;
 
 
+import com.haoge.shijie.pojo.VideoBean;
+
 public class Paging {
     private Integer indexPage;
     private Integer tatolPage;
@@ -39,4 +41,5 @@ public class Paging {
     public void setList(Object list) {
         this.list = list;
     }
+
 }

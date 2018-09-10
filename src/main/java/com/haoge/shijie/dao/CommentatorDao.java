@@ -22,12 +22,20 @@ public interface CommentatorDao {
     List<CommentatorBean> queryCommByVdoIds(Integer toVideoId);
 
     /**
+     * 根据videoId查询该视频的评论列表(包含子评论)
+     *
+     * @param toVideoId
+     * @return
+     */
+    List<CommentatorBean> queryAllCommByVdoIds(Integer toVideoId);
+
+    /**
      * 根据videoId和toUserId查询该视频的子评论列表
      *
      * @param toVideoId
      * @return
      */
-    List<CommentatorBean> queryByVdoIdAndTuds(@Param("toVideoId") Integer toVideoId, @Param("toUserId") Integer toUserId);
+    List<CommentatorBean> queryByVdoIdAndTuds(@Param("toVideoId") Integer toVideoId, @Param("toTxtId") Integer toTxtId);
 
     /**
      * 根据videoId查询该视频的评论数
@@ -43,7 +51,7 @@ public interface CommentatorDao {
      * @param toVideoId,toUserId
      * @return
      */
-    int queryCountByVidAndUid(Integer toVideoId, Integer toUserId);
+    int queryCountByVidAndUid(@Param("toVideoId") Integer toVideoId,@Param("toTxtId") Integer toTxtId);
 
 
     /**

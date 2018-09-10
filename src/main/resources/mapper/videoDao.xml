@@ -59,10 +59,10 @@
         FROM INFORMATION_SCHEMA.TABLES
         WHERE TABLE_NAME='Tb_video'
     </select>
-    <select id="queryVideosByType" resultType="com.haoge.shijie.pojo.VideoBean">
+    <select id="queryVideosByType" resultType="com.haoge.shijie.pojo.VideoBean" resultMap="resultMap">
         SELECT *
-        FROM Tb_video t
-        WHERE t.video_type=#{videoType}
+        FROM Tb_video t,Tb_user u
+        WHERE t.video_type=#{videoType} AND t.user_id=u.user_id
         ORDER BY t.player_count
         DESC limit #{start},#{end}
     </select>

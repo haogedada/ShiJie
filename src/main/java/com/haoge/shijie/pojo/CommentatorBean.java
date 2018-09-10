@@ -3,7 +3,7 @@ package com.haoge.shijie.pojo;
 import java.sql.Timestamp;
 
 public class CommentatorBean {
-    private Integer txtId, userId, toUserId, toVideoId,
+    private Integer txtId, userId, toTxtId, toVideoId,
             commentatorTipNum, commentatorTrampleNum;
     private String txtContext;
     private Timestamp txtCreatTime;
@@ -13,11 +13,11 @@ public class CommentatorBean {
 
     }
 
-    public CommentatorBean(Integer userId, Integer toUserId, Integer toVideoId,
+    public CommentatorBean(Integer userId, Integer toTxtId, Integer toVideoId,
                            Integer commentatorTipNum, Integer commentatorTrampleNum,
                            String txtContext, Timestamp txtCreatTime) {
         this.userId = userId;
-        this.toUserId = toUserId;
+        this.toTxtId = toTxtId;
         this.toVideoId = toVideoId;
         this.commentatorTipNum = commentatorTipNum;
         this.commentatorTrampleNum = commentatorTrampleNum;
@@ -25,12 +25,12 @@ public class CommentatorBean {
         this.txtCreatTime = txtCreatTime;
     }
 
-    public CommentatorBean(Integer txtId, Integer userId, Integer toUserId, Integer toVideoId,
+    public CommentatorBean(Integer txtId, Integer userId, Integer toTxtId, Integer toVideoId,
                            Integer commentatorTipNum, Integer commentatorTrampleNum,
                            String txtContext, Timestamp txtCreatTime) {
         this.txtId = txtId;
         this.userId = userId;
-        this.toUserId = toUserId;
+        this.toTxtId = toTxtId;
         this.toVideoId = toVideoId;
         this.commentatorTipNum = commentatorTipNum;
         this.commentatorTrampleNum = commentatorTrampleNum;
@@ -54,12 +54,12 @@ public class CommentatorBean {
         this.userId = userId;
     }
 
-    public Integer getToUserId() {
-        return toUserId;
+    public Integer getToTxtId() {
+        return toTxtId;
     }
 
-    public void setToUserId(Integer toUserId) {
-        this.toUserId = toUserId;
+    public void setToTxtId(Integer toTxtId) {
+        this.toTxtId = toTxtId;
     }
 
     public Integer getToVideoId() {
@@ -107,6 +107,7 @@ public class CommentatorBean {
     }
 
     public void setUserBean(UserBean userBean) {
+        userBean.setUserPassword("");
         this.userBean = userBean;
     }
 }

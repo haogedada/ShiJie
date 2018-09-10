@@ -3,6 +3,7 @@ package com.haoge.shijie.controller;
 import com.haoge.shijie.annotation.SerializedField;
 import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.pojo.CommentatorBean;
+import com.haoge.shijie.pojo.respModelBean.CommentList;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.CommentatorService;
 import com.haoge.shijie.service.VideoService;
@@ -31,19 +32,26 @@ public class InteractionController {
     }
 
     //通过to_videoId,to_userId获取视频所有子评论
-    @GetMapping("/comment/{to_videoId}/{to_userId}")
+    @GetMapping("/comment/{to_videoId}/{to_txtId}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean getCommentator(@PathVariable("to_videoId") Integer toVideoId,
-                                       @PathVariable("to_userId") Integer toUserId) {
-        List<CommentatorBean> commentators = service.findByVdoIdAndTuds(toVideoId, toUserId);
+                                       @PathVariable("to_txtId") Integer toTxtId) {
+        List<CommentatorBean> commentators = service.findByVdoIdAndTuds(toVideoId, toTxtId);
         return new ResponseBean().successMethod(commentators);
     }
 
+    //通过to_videoId获取视频所有评论
+    @GetMapping("/comments/{toVideoId}")
+    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
+    public ResponseBean getCommentList(@PathVariable("toVideoId") Integer toVideoId) {
+        List<CommentList> commentLists = service.findAllCommByVdoId(toVideoId);
+        return new ResponseBean().successMethod(commentLists);
+    }
     //顶一下视频
-    @PutMapping("/video/top/{to_videoId}")
+    @PutMapping("/video/top/{toVideoId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean videoTop(@PathVariable("to_videoId") Integer toVideoId,
+    public ResponseBean videoTop(@PathVariable("toVideoId") Integer toVideoId,
                                  @RequestHeader("Authorization") String token) {
         boolean success = videoService.modifyVideoTop(toVideoId, token);
         if (success) {
@@ -53,10 +61,10 @@ public class InteractionController {
     }
 
     //踩一下视频
-    @PutMapping("/video/trample/{to_videoId}")
+    @PutMapping("/video/trample/{toVideoId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean videoTrample(@PathVariable("to_videoId") Integer VideoId,
+    public ResponseBean videoTrample(@PathVariable("toVideoId") Integer VideoId,
                                      @RequestHeader("Authorization") String token) {
         boolean success = videoService.modifyVideoTrample(VideoId, token);
         if (success) {
@@ -66,10 +74,10 @@ public class InteractionController {
     }
 
     //视频播放量+1
-    @PutMapping("/video/playcount/{to_videoId}")
+    @PutMapping("/video/playcount/{toVideoId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean videoPlayCount(@PathVariable("to_videoId") Integer VideoId,
+    public ResponseBean videoPlayCount(@PathVariable("toVideoId") Integer VideoId,
                                        @RequestHeader("Authorization") String token) {
         boolean success = videoService.modifyVideoPlayCount(VideoId, token);
         if (success) {
@@ -78,22 +86,6 @@ public class InteractionController {
         return new ResponseBean().failMethod(500, "修改播放量未知错误");
     }
 
-    //获取所有视频分类
-    @GetMapping("/video/allVideoType")
-    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean getAllVideoType() {
-        List videoTypes = new ArrayList();
-        Constants.videoType[] videoTypeArr = Constants.videoType.values();
-        for (int i = 0; i < videoTypeArr.length; i++) {
-            videoTypes.add(videoTypeArr[i].getName() + ":" + videoTypeArr[i].getValue());
-        }
-        if (videoTypes.size() > 0) {
-            return new ResponseBean().successMethod(videoTypes);
-        } else {
-            return new ResponseBean().failMethod(500, "获取视频分类列表失败");
-        }
-
-    }
 
     //评论某个视频
     @PostMapping("/comment/{to_videoId}")
@@ -115,17 +107,17 @@ public class InteractionController {
     }
 
     //评论某个人的评论
-    @PostMapping("/comment/{to_videoId}/{to_userId}")
+    @PostMapping("/comment/{to_videoId}/{to_txtId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean addUserCommentator(@PathVariable("to_videoId") Integer toVideoId,
-                                           @PathVariable("to_userId") Integer toUserId,
+                                           @PathVariable("to_txtId") Integer toTxtId,
                                            @RequestHeader("Authorization") String token,
                                            @RequestParam("content") String content) {
         CommentatorBean commentator = new CommentatorBean();
         commentator.setToVideoId(toVideoId);
         commentator.setTxtContext(content);
-        commentator.setToUserId(toUserId);
+        commentator.setTxtId(toTxtId);
         commentator.setCommentatorTipNum(0);
         commentator.setCommentatorTrampleNum(0);
         boolean success = service.addUserCommentator(commentator, token);

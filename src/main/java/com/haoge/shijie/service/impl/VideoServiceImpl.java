@@ -1,10 +1,15 @@
 package com.haoge.shijie.service.impl;
 
 import com.haoge.shijie.constant.Constants;
+import com.haoge.shijie.dao.CommentatorDao;
 import com.haoge.shijie.dao.VideoDao;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
+import com.haoge.shijie.pojo.respModelBean.AppHomePageBean;
 import com.haoge.shijie.pojo.respModelBean.Paging;
+import com.haoge.shijie.pojo.respModelBean.TypeListBean;
+import com.haoge.shijie.pojo.respModelBean.VideoMsg;
+import com.haoge.shijie.service.CommentatorService;
 import com.haoge.shijie.service.FileService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.service.VideoService;
@@ -21,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.haoge.shijie.constant.Constants.pathType.VIDEOCOVERPATH;
@@ -41,6 +47,8 @@ public class VideoServiceImpl implements VideoService {
     private UserService userService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private CommentatorService commentatorService;
 
     /**
      * 仅修改视频信息
@@ -391,13 +399,50 @@ public class VideoServiceImpl implements VideoService {
                     pageIndex = totalPage;
                 }
                 List<VideoBean> videos = videoDao.queryVideosByType(vt1, (pageIndex - 1) * pageSize, pageSize);
-                return new Paging(pageIndex, totalPage, videos);
+                List<VideoMsg> videoMsgs=new ArrayList();
+                for (VideoBean videoBean:videos){
+                    VideoMsg videoMsg=new VideoMsg();
+                    videoMsg.setCommentNum(commentatorService.findCountByVdoId(videoBean.getVideoId()));
+                    videoMsg.setVideoBean(videoBean);
+                    videoMsgs.add(videoMsg);
+                }
+                return new Paging(pageIndex, totalPage, videoMsgs);
             } else {
                 throw new RuntimeException("该分类没有视频");
             }
         } else {
             throw new RuntimeException("参数不合法");
         }
+    }
+
+    /**
+     * 视频首页
+     * @param eachTypeNum
+     * @return
+     */
+    @Override
+    @Cacheable(value = "videoCache")
+    public AppHomePageBean showHomePage(Integer eachTypeNum) {
+        if (!StrJudgeUtil.isCorrectInt(eachTypeNum)||eachTypeNum==0){
+            throw new RuntimeException("参数不合法");
+        }
+        List<VideoBean> videoBeans=null;
+        AppHomePageBean appHomePageBean=new AppHomePageBean();
+        List<TypeListBean> typeListBeans=new ArrayList<>();
+      Constants.videoType[] videoTypes =  Constants.videoType.values();
+        for (int i = 0; i <videoTypes.length ; i++) {
+           String query=videoTypes[i].getName()+ "|" +videoTypes[i].getValue();
+            videoBeans = videoDao.queryVideosByType(query, 0, eachTypeNum);
+            if (videoBeans.size()==0){
+                continue;
+            }
+            TypeListBean typeListBean=new TypeListBean();
+            typeListBean.setVideoType(query);
+            typeListBean.setVideos(videoBeans);
+            typeListBeans.add(typeListBean);
+        }
+        appHomePageBean.setVideoTypeList(typeListBeans);
+        return appHomePageBean;
     }
 
     /**

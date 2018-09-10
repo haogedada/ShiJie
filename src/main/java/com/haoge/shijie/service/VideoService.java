@@ -1,6 +1,7 @@
 package com.haoge.shijie.service;
 
 import com.haoge.shijie.pojo.VideoBean;
+import com.haoge.shijie.pojo.respModelBean.AppHomePageBean;
 import com.haoge.shijie.pojo.respModelBean.Paging;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -98,4 +99,11 @@ public interface VideoService {
      * @return
      */
     Paging showByType(Integer pageIndex, Integer pageSize, String videoType);
+
+    /**
+     * 视频首页
+     * @param eachTypeNum
+     * @return
+     */
+    AppHomePageBean showHomePage(Integer eachTypeNum);
 }

@@ -3,6 +3,7 @@ package com.haoge.shijie.service.impl;
 import com.haoge.shijie.dao.CommentatorDao;
 import com.haoge.shijie.pojo.CommentatorBean;
 import com.haoge.shijie.pojo.UserBean;
+import com.haoge.shijie.pojo.respModelBean.CommentList;
 import com.haoge.shijie.service.CommentatorService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.util.StrJudgeUtil;
@@ -13,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -63,14 +65,14 @@ public class CommentatorServiceImpl implements CommentatorService {
      * 查找评论列表根据视频id和用户id
      *
      * @param toVideoId
-     * @param toUserId
+     * @param toTxtId
      * @return
      */
     @Override
     @Cacheable
-    public List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toUserId) {
-        if (StrJudgeUtil.isCorrectInt(toVideoId) && StrJudgeUtil.isCorrectInt(toUserId)) {
-            List<CommentatorBean> commentatorBeans = commentatorDao.queryByVdoIdAndTuds(toVideoId, toUserId);
+    public List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toTxtId) {
+        if (StrJudgeUtil.isCorrectInt(toVideoId) && StrJudgeUtil.isCorrectInt(toTxtId)) {
+            List<CommentatorBean> commentatorBeans = commentatorDao.queryByVdoIdAndTuds(toVideoId, toTxtId);
             if (commentatorBeans.size() > 0) {
                 return commentatorBeans;
             } else {
@@ -80,7 +82,6 @@ public class CommentatorServiceImpl implements CommentatorService {
             throw new RuntimeException("参数不合法");
         }
     }
-
     /**
      * 根据videoId查询该视频的评论数
      *
@@ -103,16 +104,16 @@ public class CommentatorServiceImpl implements CommentatorService {
     }
 
     /**
-     * 根据UserId查询该视频的评论者的评论数
+     * 根据toVideoId,toTxtId查询该视频的评论者的评论数
      *
-     * @param toUserId
+     * @param toTxtId
      * @return
      */
     @Override
     @Cacheable
-    public int findCountByAndVidUid(Integer toVideoId, Integer toUserId) {
-        if (StrJudgeUtil.isCorrectInt(toUserId)) {
-            int count = commentatorDao.queryCountByVidAndUid(toVideoId, toUserId);
+    public int findCountByAndVidUid(Integer toVideoId, Integer toTxtId) {
+        if (StrJudgeUtil.isCorrectInt(toTxtId)) {
+            int count = commentatorDao.queryCountByVidAndUid(toVideoId, toTxtId);
             if (count >= 0) {
                 return count;
             } else {
@@ -126,7 +127,7 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Override
     @Transactional
     public boolean addCommentator(CommentatorBean commentator) {
-        if (StrJudgeUtil.isCorrectInt(commentator.getToUserId()) &&
+        if (StrJudgeUtil.isCorrectInt(commentator.getToTxtId()) &&
                 StrJudgeUtil.isCorrectInt(commentator.getToVideoId())) {
             try {
                 int res = commentatorDao.insertCommentator(commentator);
@@ -156,7 +157,7 @@ public class CommentatorServiceImpl implements CommentatorService {
         if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId())) {
             UserBean userBean = userService.findUserByToken(token);
             content.setUserId(userBean.getUserId());
-            content.setToUserId(-1);
+            content.setToTxtId(-1);
             try {
                 int res = commentatorDao.insertCommentator(content);
                 if (res > 0) {
@@ -183,7 +184,7 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Transactional
     public boolean addUserCommentator(CommentatorBean content, String token) {
         if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId()) &&
-                StrJudgeUtil.isCorrectInt(content.getToUserId())) {
+                StrJudgeUtil.isCorrectInt(content.getToTxtId())) {
             UserBean userBean = userService.findUserByToken(token);
             content.setUserId(userBean.getUserId());
             try {
@@ -305,6 +306,45 @@ public class CommentatorServiceImpl implements CommentatorService {
             }
         } else {
             throw new RuntimeException("评论踩一下参数错误");
+        }
+    }
+
+    /**
+     * 根据视频id查找视频
+     * @param toVideoId
+     * @return
+     */
+    @Override
+    public List<CommentList> findAllCommByVdoId(Integer toVideoId) {
+        if(StrJudgeUtil.isCorrectInt(toVideoId)){
+            List<CommentList> commentLists=new ArrayList<>();
+            List<CommentatorBean> commentatorBeans=commentatorDao.queryAllCommByVdoIds(toVideoId);
+            for (CommentatorBean c:commentatorBeans){
+                CommentList commentList=new CommentList();
+                if (c.getToTxtId()==-1) {
+                    commentList.setComment(c);
+                    List<CommentatorBean> commentatorBeans1=new ArrayList<>();
+                    for (CommentatorBean c1:commentatorBeans){
+                        if (c1.getToTxtId()==c.getTxtId()&&c1.getToTxtId()!=-1){
+                            commentatorBeans1.add(c1);
+                        }else {
+                            continue;
+                        }
+                    }
+                    commentList.setCommentNum(commentatorBeans1.size());
+                    commentList.setComments(commentatorBeans1);
+                }else {
+                    continue;
+                }
+                commentLists.add(commentList);
+            }
+            if (commentLists.size()>0){
+                return commentLists;
+            }else {
+                return null;
+            }
+        }else {
+            throw new RuntimeException("参数不合法");
         }
     }
 }
