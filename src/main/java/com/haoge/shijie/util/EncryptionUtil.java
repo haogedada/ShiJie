@@ -16,15 +16,13 @@ import java.security.spec.InvalidKeySpecException;
 
 public class EncryptionUtil {
 
-    private final static String DES = "DES";
-    private static final String CIPHER_ALGORITHM = "DESEDE/CBC/PKCS5Padding";
-    private static final String KEY_ALGORITHM = "desde";
-
     /**
      * IvParameterSpec参数
      */
     public static final byte[] keyiv = {1, 2, 3, 4, 5, 6, 7, 8};
-
+    private final static String DES = "DES";
+    private static final String CIPHER_ALGORITHM = "DESEDE/CBC/PKCS5Padding";
+    private static final String KEY_ALGORITHM = "desde";
     private static final String ENCODING = "UTF-8";
 
 

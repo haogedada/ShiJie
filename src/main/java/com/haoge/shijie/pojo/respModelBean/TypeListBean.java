@@ -10,7 +10,7 @@ public class TypeListBean {
     private List<VideoBean> videos;
 
 
-    public TypeListBean(){
+    public TypeListBean() {
 
     }
 

@@ -1,8 +1,5 @@
 package com.haoge.shijie.pojo.respModelBean;
 
-import com.haoge.shijie.pojo.VideoBean;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class AppHomePageBean {
@@ -10,7 +7,8 @@ public class AppHomePageBean {
     private Object homePageHead;
     private List<TypeListBean> videoTypeList;
     private Object tail;
-    public AppHomePageBean(){
+
+    public AppHomePageBean() {
 
     }
 

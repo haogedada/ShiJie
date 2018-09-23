@@ -9,20 +9,19 @@ import javax.crypto.spec.DESKeySpec;
 import java.security.Key;
 
 public class DesUtil {
+    public static final String ENCODING = "UTF-8";
     private static final String KEY_ALGORITHM = "des";
-
     private static final String CIPHER_ALGORITHM_ECB = "DES/ECB/PKCS5Padding";
 
-    public static final String ENCODING = "UTF-8";
-
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
         String data = "abcdefghd";
         String key = "haogedad";
         //输出加密
-       // System.out.println(encrypt(data, key));
+        // System.out.println(encrypt(data, key));
         //输出解密
         //System.out.println(decrypt("sas", key));
     }
+
     /**
      * 还原密钥
      *
@@ -39,8 +38,9 @@ public class DesUtil {
 
     /**
      * des加密
+     *
      * @param data 加密数据
-     * @param key 解密密匙
+     * @param key  解密密匙
      * @return
      * @throws Exception
      */
@@ -54,8 +54,9 @@ public class DesUtil {
 
     /**
      * des解密
+     *
      * @param data 加密数据
-     * @param key 解密密匙
+     * @param key  解密密匙
      * @return
      * @throws Exception
      */

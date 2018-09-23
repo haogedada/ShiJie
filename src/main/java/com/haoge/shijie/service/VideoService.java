@@ -102,6 +102,7 @@ public interface VideoService {
 
     /**
      * 视频首页
+     *
      * @param eachTypeNum
      * @return
      */

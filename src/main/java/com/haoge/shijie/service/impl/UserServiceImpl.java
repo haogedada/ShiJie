@@ -234,11 +234,11 @@ public class UserServiceImpl implements UserService {
             String[] filesName = null;
             if (FileUtil.isImageFile(fileType)) {
                 String ext = FileUtil.fileTypeConvert(fileType);
-                String userName=JWTUtil.getUsername(token);
+                String userName = JWTUtil.getUsername(token);
                 UserBean userBean1 = userDao.queryUserByName(userName);
                 //删除原来的视频
-                boolean isDelete=fileService.deleteFile(filePath + HEADPATH.getName(),userBean1.getHeadimgUrl());
-                if(!isDelete){
+                boolean isDelete = fileService.deleteFile(filePath + HEADPATH.getName(), userBean1.getHeadimgUrl());
+                if (!isDelete) {
                     throw new RuntimeException("操作失败");
                 }
                 String fileName = HEADIMGPREFIX.getName() + userBean1.getUserId() + ext;
@@ -256,7 +256,7 @@ public class UserServiceImpl implements UserService {
                     } else {
                         return false;
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e.getMessage() + "修改资料出错");
                 }
             } else {

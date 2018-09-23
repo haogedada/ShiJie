@@ -1,8 +1,6 @@
 package com.haoge.shijie.pojo.respModelBean;
 
 
-import com.haoge.shijie.pojo.VideoBean;
-
 public class Paging {
     private Integer indexPage;
     private Integer tatolPage;

@@ -19,5 +19,5 @@ public interface FileService {
     /**
      * 删除文件
      */
-    boolean deleteFile(String filePath,String fileUrl);
+    boolean deleteFile(String filePath, String fileUrl);
 }

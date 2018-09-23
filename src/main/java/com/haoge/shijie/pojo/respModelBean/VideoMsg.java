@@ -5,10 +5,12 @@ import com.haoge.shijie.pojo.VideoBean;
 public class VideoMsg {
     private int commentNum;
     private VideoBean videoBean;
-    public VideoMsg(){
+
+    public VideoMsg() {
 
     }
-    public VideoMsg( int commentNum, VideoBean videoBean) {
+
+    public VideoMsg(int commentNum, VideoBean videoBean) {
         this.commentNum = commentNum;
         this.videoBean = videoBean;
     }

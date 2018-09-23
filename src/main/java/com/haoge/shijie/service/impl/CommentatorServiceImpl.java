@@ -82,6 +82,7 @@ public class CommentatorServiceImpl implements CommentatorService {
             throw new RuntimeException("参数不合法");
         }
     }
+
     /**
      * 根据videoId查询该视频的评论数
      *
@@ -311,39 +312,40 @@ public class CommentatorServiceImpl implements CommentatorService {
 
     /**
      * 根据视频id查找视频
+     *
      * @param toVideoId
      * @return
      */
     @Override
     public List<CommentList> findAllCommByVdoId(Integer toVideoId) {
-        if(StrJudgeUtil.isCorrectInt(toVideoId)){
-            List<CommentList> commentLists=new ArrayList<>();
-            List<CommentatorBean> commentatorBeans=commentatorDao.queryAllCommByVdoIds(toVideoId);
-            for (CommentatorBean c:commentatorBeans){
-                CommentList commentList=new CommentList();
-                if (c.getToTxtId()==-1) {
+        if (StrJudgeUtil.isCorrectInt(toVideoId)) {
+            List<CommentList> commentLists = new ArrayList<>();
+            List<CommentatorBean> commentatorBeans = commentatorDao.queryAllCommByVdoIds(toVideoId);
+            for (CommentatorBean c : commentatorBeans) {
+                CommentList commentList = new CommentList();
+                if (c.getToTxtId() == -1) {
                     commentList.setComment(c);
-                    List<CommentatorBean> commentatorBeans1=new ArrayList<>();
-                    for (CommentatorBean c1:commentatorBeans){
-                        if (c1.getToTxtId()==c.getTxtId()&&c1.getToTxtId()!=-1){
+                    List<CommentatorBean> commentatorBeans1 = new ArrayList<>();
+                    for (CommentatorBean c1 : commentatorBeans) {
+                        if (c1.getToTxtId() == c.getTxtId() && c1.getToTxtId() != -1) {
                             commentatorBeans1.add(c1);
-                        }else {
+                        } else {
                             continue;
                         }
                     }
                     commentList.setCommentNum(commentatorBeans1.size());
                     commentList.setComments(commentatorBeans1);
-                }else {
+                } else {
                     continue;
                 }
                 commentLists.add(commentList);
             }
-            if (commentLists.size()>0){
+            if (commentLists.size() > 0) {
                 return commentLists;
-            }else {
+            } else {
                 return null;
             }
-        }else {
+        } else {
             throw new RuntimeException("参数不合法");
         }
     }

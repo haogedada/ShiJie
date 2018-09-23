@@ -1,7 +1,6 @@
 package com.haoge.shijie.service.impl;
 
 import com.haoge.shijie.constant.Constants;
-import com.haoge.shijie.dao.CommentatorDao;
 import com.haoge.shijie.dao.VideoDao;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
@@ -127,8 +126,8 @@ public class VideoServiceImpl implements VideoService {
             }
             UserBean userBean = userService.findUserByToken(token);
             VideoBean videoBean1 = findVideoByVid(videoBean.getVideoId());
-            boolean isDelete=fileService.deleteFile(filePath + VIDEOCOVERPATH.getName(),videoBean1.getVideoCoverUrl());
-            if(!isDelete){
+            boolean isDelete = fileService.deleteFile(filePath + VIDEOCOVERPATH.getName(), videoBean1.getVideoCoverUrl());
+            if (!isDelete) {
                 throw new RuntimeException("操作失败");
             }
             if (userBean.getUserId() == videoBean1.getUserId()) {
@@ -399,9 +398,9 @@ public class VideoServiceImpl implements VideoService {
                     pageIndex = totalPage;
                 }
                 List<VideoBean> videos = videoDao.queryVideosByType(vt1, (pageIndex - 1) * pageSize, pageSize);
-                List<VideoMsg> videoMsgs=new ArrayList();
-                for (VideoBean videoBean:videos){
-                    VideoMsg videoMsg=new VideoMsg();
+                List<VideoMsg> videoMsgs = new ArrayList();
+                for (VideoBean videoBean : videos) {
+                    VideoMsg videoMsg = new VideoMsg();
                     videoMsg.setCommentNum(commentatorService.findCountByVdoId(videoBean.getVideoId()));
                     videoMsg.setVideoBean(videoBean);
                     videoMsgs.add(videoMsg);
@@ -417,26 +416,27 @@ public class VideoServiceImpl implements VideoService {
 
     /**
      * 视频首页
+     *
      * @param eachTypeNum
      * @return
      */
     @Override
     @Cacheable(value = "videoCache")
     public AppHomePageBean showHomePage(Integer eachTypeNum) {
-        if (!StrJudgeUtil.isCorrectInt(eachTypeNum)||eachTypeNum==0){
+        if (!StrJudgeUtil.isCorrectInt(eachTypeNum) || eachTypeNum == 0) {
             throw new RuntimeException("参数不合法");
         }
-        List<VideoBean> videoBeans=null;
-        AppHomePageBean appHomePageBean=new AppHomePageBean();
-        List<TypeListBean> typeListBeans=new ArrayList<>();
-      Constants.videoType[] videoTypes =  Constants.videoType.values();
-        for (int i = 0; i <videoTypes.length ; i++) {
-           String query=videoTypes[i].getName()+ "|" +videoTypes[i].getValue();
+        List<VideoBean> videoBeans = null;
+        AppHomePageBean appHomePageBean = new AppHomePageBean();
+        List<TypeListBean> typeListBeans = new ArrayList<>();
+        Constants.videoType[] videoTypes = Constants.videoType.values();
+        for (int i = 0; i < videoTypes.length; i++) {
+            String query = videoTypes[i].getName() + "|" + videoTypes[i].getValue();
             videoBeans = videoDao.queryVideosByType(query, 0, eachTypeNum);
-            if (videoBeans.size()==0){
+            if (videoBeans.size() == 0) {
                 continue;
             }
-            TypeListBean typeListBean=new TypeListBean();
+            TypeListBean typeListBean = new TypeListBean();
             typeListBean.setVideoType(query);
             typeListBean.setVideos(videoBeans);
             typeListBeans.add(typeListBean);

@@ -3,12 +3,14 @@ package com.haoge.shijie.pojo.respModelBean;
 import com.haoge.shijie.pojo.CommentatorBean;
 
 import java.util.List;
-public class CommentList{
-        private int commentNum;
-        private CommentatorBean comment;
-        private List<CommentatorBean> comments;
-        public CommentList(){
-        }
+
+public class CommentList {
+    private int commentNum;
+    private CommentatorBean comment;
+    private List<CommentatorBean> comments;
+
+    public CommentList() {
+    }
 
     public CommentList(int commentNum, CommentatorBean comment, List<CommentatorBean> comments) {
         this.commentNum = commentNum;

@@ -33,6 +33,7 @@ public class TouristController {
         Paging paging = videoService.searchVideos(pageIndex, pageSize, content);
         return new ResponseBean().successMethod(paging);
     }
+
     //按视频分类显示
     @GetMapping("/videoType/{pageIndex}&&{pageSize}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
@@ -45,13 +46,14 @@ public class TouristController {
 
     /**
      * 视界app首页
+     *
      * @param eachTypeNum
      * @return
      */
     @GetMapping("/app/homepage/{eachTypeNum}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean getHomePage(@PathVariable("eachTypeNum") Integer eachTypeNum) {
-       AppHomePageBean appHomePageBean = videoService.showHomePage(eachTypeNum);
+        AppHomePageBean appHomePageBean = videoService.showHomePage(eachTypeNum);
         return new ResponseBean().successMethod(appHomePageBean);
     }
 

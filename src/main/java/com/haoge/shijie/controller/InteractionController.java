@@ -1,7 +1,6 @@
 package com.haoge.shijie.controller;
 
 import com.haoge.shijie.annotation.SerializedField;
-import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.pojo.CommentatorBean;
 import com.haoge.shijie.pojo.respModelBean.CommentList;
 import com.haoge.shijie.pojo.response.ResponseBean;
@@ -11,7 +10,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -47,6 +45,7 @@ public class InteractionController {
         List<CommentList> commentLists = service.findAllCommByVdoId(toVideoId);
         return new ResponseBean().successMethod(commentLists);
     }
+
     //顶一下视频
     @PutMapping("/video/top/{toVideoId}")
     @RequiresAuthentication

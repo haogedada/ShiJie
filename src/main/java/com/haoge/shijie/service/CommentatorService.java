@@ -2,7 +2,6 @@ package com.haoge.shijie.service;
 
 import com.haoge.shijie.pojo.CommentatorBean;
 import com.haoge.shijie.pojo.respModelBean.CommentList;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public interface CommentatorService {
      * @param toVideoId
      * @return
      */
-    List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId,Integer toTxtId);
+    List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toTxtId);
 
     /**
      * 根据videoId查询该视频的评论数
@@ -107,8 +106,10 @@ public interface CommentatorService {
      * @return 是否成功
      */
     boolean modifyCommentTrample(Integer txtId, String token);
+
     /**
      * 根据视频id获取该视频的所有评论
+     *
      * @param toVideoId
      * @return
      */

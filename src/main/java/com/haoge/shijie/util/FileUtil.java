@@ -103,6 +103,20 @@ public class FileUtil {
     }
 
     /**
+     * 删除文件
+     *
+     * @param filePath
+     */
+    public static boolean deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 异步文件上传,如果是图片文件就添加水印
      *
      * @param file,filePath,fileName 文件字节,文件路径,文件名
@@ -231,19 +245,6 @@ public class FileUtil {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
-    }
-
-    /**
-     * 删除文件
-     * @param filePath
-     */
-    public static boolean deleteFile(String filePath){
-        File file=new File(filePath);
-        if (file.exists()){
-            file.delete();
-            return true;
-        }
-        return false;
     }
 
 }

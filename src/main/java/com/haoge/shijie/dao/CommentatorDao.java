@@ -51,7 +51,7 @@ public interface CommentatorDao {
      * @param toVideoId,toUserId
      * @return
      */
-    int queryCountByVidAndUid(@Param("toVideoId") Integer toVideoId,@Param("toTxtId") Integer toTxtId);
+    int queryCountByVidAndUid(@Param("toVideoId") Integer toVideoId, @Param("toTxtId") Integer toTxtId);
 
 
     /**

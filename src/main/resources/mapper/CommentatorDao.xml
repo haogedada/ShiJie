@@ -27,11 +27,11 @@
         </association>
     </resultMap>
 
-        <!--动态代理的开发规范-->
-            <!--1: 映射文件的namespace必须等于接口的全路径名称-->
-            <!--2: 映射文件的sql唯一标示,必须等于接口的方法名称-->
-            <!--3: 映射文件的parameterType必须等于接口方法的参数类型-->
-            <!--4: 映射文件resultType必须等于接口方法的返回类型-->
+    <!--动态代理的开发规范-->
+    <!--1: 映射文件的namespace必须等于接口的全路径名称-->
+    <!--2: 映射文件的sql唯一标示,必须等于接口的方法名称-->
+    <!--3: 映射文件的parameterType必须等于接口方法的参数类型-->
+    <!--4: 映射文件resultType必须等于接口方法的返回类型-->
     <!--sql多个查询-->
     <select id="queryCommentatorList" resultType="com.haoge.shijie.pojo.CommentatorBean">
         SELECT
@@ -55,7 +55,8 @@
         WHERE
         t.to_video_id=#{toVideoId} AND t.user_id=u.user_id
     </select>
-    <select id="queryByVdoIdAndTuds" resultType="com.haoge.shijie.pojo.CommentatorBean" parameterType="Integer" resultMap="commentAndUserMap">
+    <select id="queryByVdoIdAndTuds" resultType="com.haoge.shijie.pojo.CommentatorBean" parameterType="Integer"
+            resultMap="commentAndUserMap">
         SELECT
         *
         FROM
