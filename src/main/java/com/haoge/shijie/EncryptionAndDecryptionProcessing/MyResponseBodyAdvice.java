@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Order(1)
 //@SuppressWarnings("unchecked")
-@ControllerAdvice(basePackages = "com.haoge.shijie.controller.4")//这句注释或错误才可以关闭加密
+@ControllerAdvice(basePackages = "com.haoge.shijie.controller")//这句注释或错误才可以关闭加密
 public class MyResponseBodyAdvice implements ResponseBodyAdvice {
     //包含项
     private String[] includes = {};
@@ -78,7 +78,6 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
             retObj = handleSingleObject(o);
 
         }
-
         return retObj;
     }
 
@@ -170,10 +169,4 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice {
         return newVal;
     }
 
-    private String strCheck(String str) {
-        StringBuilder sb = new StringBuilder(str);
-        sb.replace(0, 1, "");
-        sb.replace(sb.length() - 1, sb.length(), "");
-        return sb.toString();
-    }
 }

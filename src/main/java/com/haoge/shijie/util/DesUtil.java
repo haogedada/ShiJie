@@ -1,118 +1,69 @@
 package com.haoge.shijie.util;
 
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import java.io.IOException;
-import java.security.SecureRandom;
+import java.security.Key;
 
 public class DesUtil {
-    private final static String DES = "DES";
+    private static final String KEY_ALGORITHM = "des";
 
-    public static void main(String[] args) throws Exception {
-        //调试加密解密 key最多为8个字符
-        String data = "";
-        String key = "§@лa#ю*g~";
-        String data4 = "UazVyt4KfG+lHa8HFb5eFA==";
+    private static final String CIPHER_ALGORITHM_ECB = "DES/ECB/PKCS5Padding";
 
+    public static final String ENCODING = "UTF-8";
+
+    public static void main(String[] args)  {
+        String data = "abcdefghd";
+        String key = "haogedad";
         //输出加密
-        //System.out.println(encrypt(data, key));
+       // System.out.println(encrypt(data, key));
         //输出解密
-        System.out.println(decrypt(data4, key));
+        //System.out.println(decrypt("sas", key));
+    }
+    /**
+     * 还原密钥
+     *
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    private static Key toKey(byte[] key) throws Exception {
+        DESKeySpec des = new DESKeySpec(key);
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(KEY_ALGORITHM);
+        SecretKey secretKey = keyFactory.generateSecret(des);
+        return secretKey;
     }
 
     /**
-     * Description 根据键值进行加密
-     *
-     * @param data
-     * @param key  加密键byte数组
+     * des加密
+     * @param data 加密数据
+     * @param key 解密密匙
      * @return
      * @throws Exception
      */
     public static String encrypt(String data, String key) throws Exception {
-        byte[] bt = encrypt(data.getBytes("UTF-8"), key.getBytes("UTF-8"));
-        String strs = new BASE64Encoder().encode(bt);
-        return strs;
+        Key k = toKey(key.getBytes(ENCODING));
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
+        cipher.init(Cipher.ENCRYPT_MODE, k);
+        String str = Base64.encodeBase64String(cipher.doFinal(data.getBytes(ENCODING)));
+        return str;
     }
 
     /**
-     * Description 根据键值进行解密
-     *
-     * @param data
-     * @param key  加密键byte数组
-     * @return
-     * @throws IOException
-     * @throws Exception
-     */
-    public static String decrypt(String data, String key) throws IOException,
-            Exception {
-        if (data == null)
-            return null;
-        BASE64Decoder decoder = new BASE64Decoder();
-        byte[] buf = decoder.decodeBuffer(data);
-        byte[] bt = decrypt(buf, key.getBytes("UTF-8"));
-        return new String(bt, "UTF-8");
-    }
-
-    /**
-     * Description 根据键值进行加密
-     *
-     * @param data
-     * @param key  加密键byte数组
+     * des解密
+     * @param data 加密数据
+     * @param key 解密密匙
      * @return
      * @throws Exception
      */
-    private static byte[] encrypt(byte[] data, byte[] key) throws Exception {
-        // 生成一个可信任的随机数源
-        SecureRandom sr = new SecureRandom();
-
-        // 从原始密钥数据创建DESKeySpec对象
-        DESKeySpec dks = new DESKeySpec(key);
-
-        // 创建一个密钥工厂，然后用它把DESKeySpec转换成SecretKey对象
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(DES);
-        SecretKey securekey = keyFactory.generateSecret(dks);
-
-        // Cipher对象实际完成加密操作
-        Cipher cipher = Cipher.getInstance(DES);
-
-        // 用密钥初始化Cipher对象
-        cipher.init(Cipher.ENCRYPT_MODE, securekey, sr);
-
-        return cipher.doFinal(data);
-    }
-
-
-    /**
-     * Description 根据键值进行解密
-     *
-     * @param data
-     * @param key  加密键byte数组
-     * @return
-     * @throws Exception
-     */
-    private static byte[] decrypt(byte[] data, byte[] key) throws Exception {
-        // 生成一个可信任的随机数源
-        SecureRandom sr = new SecureRandom();
-
-        // 从原始密钥数据创建DESKeySpec对象
-        DESKeySpec dks = new DESKeySpec(key);
-
-        // 创建一个密钥工厂，然后用它把DESKeySpec转换成SecretKey对象
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(DES);
-        SecretKey securekey = keyFactory.generateSecret(dks);
-
-        // Cipher对象实际完成解密操作
-        Cipher cipher = Cipher.getInstance(DES);
-
-        // 用密钥初始化Cipher对象
-        cipher.init(Cipher.DECRYPT_MODE, securekey, sr);
-
-        return cipher.doFinal(data);
+    public static String decrypt(String data, String key) throws Exception {
+        Key k = toKey(key.getBytes(ENCODING));
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
+        cipher.init(Cipher.DECRYPT_MODE, k);
+        byte[] bytes = cipher.doFinal(Base64.decodeBase64(data));
+        return new String(bytes, ENCODING);
     }
 }

@@ -21,7 +21,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     //返回用户个人信息 通过token
     @GetMapping("/user")
     @RequiresAuthentication

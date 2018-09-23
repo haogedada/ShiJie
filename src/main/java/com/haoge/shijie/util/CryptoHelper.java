@@ -1,7 +1,7 @@
 package com.haoge.shijie.util;
 
 public class CryptoHelper {
-    private static String key = "§@лa#ю*g~";
+    private static String key = "haogedad";
 
     public static boolean isStringInArray(String str, String[] array) {
         for (String val : array) {
