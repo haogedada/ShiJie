@@ -30,10 +30,18 @@ public interface VideoDao {
     /**
      * 根据视频类型查询列表并按播放量排序
      *
-     * @param videoType
+     * @param videoType,pageIndex,pageIndex
      * @return
      */
     List<VideoBean> queryVideosByType(@Param("videoType") String videoType, @Param("start") Integer pageIndex, @Param("end") Integer pageSize);
+
+    /**
+     * 根据视频类型查询列表并按播放量排序
+     *
+     * @param pageIndex,pageSize
+     * @return
+     */
+    List<VideoBean> queryVideosByIndexDESC(@Param("index")String index,@Param("start") Integer pageIndex, @Param("end") Integer pageSize);
 
     /**
      * 根据关键字查询

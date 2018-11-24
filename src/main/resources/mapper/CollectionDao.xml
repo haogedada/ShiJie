@@ -91,14 +91,15 @@
             keyColumn="id" parameterType="com.haoge.shijie.pojo.CollectionBean">
         INSERT INTO
         Tb_usercollection(user_id,video_id,creat_time)
-        VALUES(#{userId},#{videoTd},#{creatTime})
+        VALUES(#{userId},#{videoId},#{creatTime})
     </insert>
+
     <update id="updateCollection" parameterType="com.haoge.shijie.pojo.CollectionBean">
         UPDATE
         Tb_usercollection
         <set>
             <if test="userId!=null">user_id=#{userId},</if>
-            <if test="videoTd!=null">video_id=#{videoTd},</if>
+            <if test="videoId!=null">video_id=#{videoId},</if>
             creat_time=#{creatTime},
         </set>
         WHERE id=#{id}

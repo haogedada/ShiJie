@@ -48,7 +48,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Cacheable
-    public List<CommentatorBean> findCommByVdoIds(Integer toVideoId) {
+    public List<CommentatorBean> findCommByVdoIds(int toVideoId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId)) {
             List<CommentatorBean> commentatorBeans = commentatorDao.queryCommByVdoIds(toVideoId);
             if (commentatorBeans.size() > 0) {
@@ -70,7 +70,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Cacheable
-    public List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toTxtId) {
+    public List<CommentatorBean> findByVdoIdAndTuds(int toVideoId, int toTxtId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId) && StrJudgeUtil.isCorrectInt(toTxtId)) {
             List<CommentatorBean> commentatorBeans = commentatorDao.queryByVdoIdAndTuds(toVideoId, toTxtId);
             if (commentatorBeans.size() > 0) {
@@ -91,7 +91,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Cacheable
-    public int findCountByVdoId(Integer toVideoId) {
+    public int findCountByVdoId(int toVideoId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId)) {
             int count = commentatorDao.queryCountByVdoId(toVideoId);
             if (count >= 0) {
@@ -112,7 +112,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      */
     @Override
     @Cacheable
-    public int findCountByAndVidUid(Integer toVideoId, Integer toTxtId) {
+    public int findCountByAndVidUid(int toVideoId, int toTxtId) {
         if (StrJudgeUtil.isCorrectInt(toTxtId)) {
             int count = commentatorDao.queryCountByVidAndUid(toVideoId, toTxtId);
             if (count >= 0) {
@@ -155,7 +155,8 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Override
     @Transactional
     public boolean addVideoCommentator(CommentatorBean content, String token) {
-        if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId())) {
+        if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId())
+                &&StrJudgeUtil.isCorrectStr(content.getTxtContext())) {
             UserBean userBean = userService.findUserByToken(token);
             content.setUserId(userBean.getUserId());
             content.setToTxtId(-1);
@@ -185,7 +186,8 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Transactional
     public boolean addUserCommentator(CommentatorBean content, String token) {
         if (content != null && StrJudgeUtil.isCorrectInt(content.getToVideoId()) &&
-                StrJudgeUtil.isCorrectInt(content.getToTxtId())) {
+                StrJudgeUtil.isCorrectInt(content.getToTxtId())&&
+                StrJudgeUtil.isCorrectStr(content.getTxtContext())) {
             UserBean userBean = userService.findUserByToken(token);
             content.setUserId(userBean.getUserId());
             try {
@@ -238,7 +240,7 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Override
     @Transactional
     @CacheEvict(value = "comment", allEntries = true)
-    public boolean delCommentator(Integer txtId) {
+    public boolean delCommentator(int txtId) {
         if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {
                 int res = commentatorDao.deleteCommentator(txtId);
@@ -266,7 +268,7 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Override
     @Transactional
     @CacheEvict(value = "comment", allEntries = true)
-    public boolean modifyCommentTop(Integer txtId, String token) {
+    public boolean modifyCommentTop(int txtId, String token) {
         if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {
                 int res = commentatorDao.updateCommTopAdd(txtId);
@@ -293,7 +295,7 @@ public class CommentatorServiceImpl implements CommentatorService {
     @Override
     @Transactional
     @CacheEvict(value = "comment", allEntries = true)
-    public boolean modifyCommentTrample(Integer txtId, String token) {
+    public boolean modifyCommentTrample(int txtId, String token) {
         if (StrJudgeUtil.isCorrectInt(txtId)) {
             try {
                 int res = commentatorDao.updateCommTraAdd(txtId);
@@ -317,7 +319,7 @@ public class CommentatorServiceImpl implements CommentatorService {
      * @return
      */
     @Override
-    public List<CommentList> findAllCommByVdoId(Integer toVideoId) {
+    public List<CommentList> findAllCommByVdoId(int toVideoId) {
         if (StrJudgeUtil.isCorrectInt(toVideoId)) {
             List<CommentList> commentLists = new ArrayList<>();
             List<CommentatorBean> commentatorBeans = commentatorDao.queryAllCommByVdoIds(toVideoId);

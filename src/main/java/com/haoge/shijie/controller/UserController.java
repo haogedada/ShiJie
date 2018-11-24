@@ -97,7 +97,7 @@ public class UserController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean addFollow(@RequestHeader("Authorization") String token,
-                                  @PathVariable("userId") Integer friendId) {
+                                  @PathVariable("userId") int friendId) {
         boolean success = userService.addFollow(token, friendId);
         if (success) {
             return new ResponseBean().successMethod();
@@ -111,12 +111,12 @@ public class UserController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
     public ResponseBean delFollow(@RequestHeader("Authorization") String token,
-                                  @PathVariable("friendId") Integer friendId) {
-        boolean success = userService.delFollow(token, friendId);
+                                  @PathVariable("friendId") int friendId) {
+        boolean success = userService.cancelFollow(token, friendId);
         if (success) {
             return new ResponseBean().successMethod();
         } else {
-            throw new RuntimeException("取消关注失败");
+            return new ResponseBean().failMethod(500,"取消关注失败");
         }
     }
 
@@ -124,8 +124,9 @@ public class UserController {
     @GetMapping("/user/{userId}")
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean backUser(@PathVariable("userId") Integer userId) {
+    public ResponseBean backUser(@PathVariable("userId") int userId) {
         UserHomeBean userHome = userService.goUserHomeByUid(userId);
         return new ResponseBean().successMethod(userHome);
     }
+
 }

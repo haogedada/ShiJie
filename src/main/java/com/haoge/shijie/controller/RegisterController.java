@@ -9,6 +9,7 @@ import com.haoge.shijie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -37,13 +38,15 @@ public class RegisterController {
     //邮箱激活账号
     @GetMapping("/register/activation")
     @SerializedField(includes = {"code", "msg", "data"})
-    public ResponseBean Activation(@RequestParam("code") String code, HttpServletResponse response) throws Exception {
+    public void Activation(@RequestParam("code") String code,
+                           HttpServletResponse response) throws Exception {
         boolean success = Service.activationUser(code);
         if (success) {
-            //response.sendRedirect("/login.html");
-            return new ResponseBean().successMethod("激活成功，请到登录页面进行登录");
+            response.sendRedirect("http://www.haogedada.top/apiep/success.html");
+           // return new ResponseBean().successMethod("激活成功，请到登录页面进行登录");
         } else {
-            return new ResponseBean().successMethod("激活失败");
+          //  return new ResponseBean().successMethod("激活失败");
+            response.sendRedirect("http://www.haogedada.top/apiep/fail.html");
         }
     }
 

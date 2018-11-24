@@ -21,7 +21,7 @@ public interface UserService {
      * @param userId
      * @return
      */
-    UserBean findUserById(Integer userId);
+    UserBean findUserById(int userId);
 
     /**
      * 根据id查询关联区域
@@ -29,7 +29,7 @@ public interface UserService {
      * @param userId
      * @return
      */
-    UserBean findUserAndAuxById(Integer userId);
+    UserBean findUserAndAuxById(int userId);
 
     /**
      * 根据token查询区域
@@ -69,7 +69,7 @@ public interface UserService {
      * @param userId
      * @return
      */
-    boolean delUser(Integer userId);
+    boolean delUser(int userId);
 
     /**
      * 根据token查询关注列表
@@ -93,7 +93,7 @@ public interface UserService {
      * @param userId
      * @return
      */
-    UserHomeBean goUserHomeByUid(Integer userId);
+    UserHomeBean goUserHomeByUid(int userId);
 
     /**
      * 修改密码
@@ -111,14 +111,29 @@ public interface UserService {
      * @param friendId
      * @return
      */
-    boolean addFollow(String token, Integer friendId);
+    boolean addFollow(String token, int friendId);
 
     /**
      * 取消关注
-     *
      * @param token
-     * @param friendId
+     * @param friend
      * @return
      */
-    boolean delFollow(String token, Integer friendId);
+    boolean cancelFollow(String token,int friend);
+
+    /**
+     * 用户收藏视频
+     * @param token
+     * @param videoId
+     * @return
+     */
+    boolean collectUserVideo(String token, int videoId);
+
+    /**
+     * 用户取消收藏
+     * @param token
+     * @param videoId
+     * @return
+     */
+    boolean cancelCollectUserVideo(String token, int videoId);
 }

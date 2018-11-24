@@ -20,7 +20,7 @@ public interface CommentatorService {
      * @param toVideoId
      * @return
      */
-    List<CommentatorBean> findCommByVdoIds(Integer toVideoId);
+    List<CommentatorBean> findCommByVdoIds(int toVideoId);
 
     /**
      * 根据videoId和toUserId查询该视频的子评论列表
@@ -28,7 +28,7 @@ public interface CommentatorService {
      * @param toVideoId
      * @return
      */
-    List<CommentatorBean> findByVdoIdAndTuds(Integer toVideoId, Integer toTxtId);
+    List<CommentatorBean> findByVdoIdAndTuds(int toVideoId, int toTxtId);
 
     /**
      * 根据videoId查询该视频的评论数
@@ -36,7 +36,7 @@ public interface CommentatorService {
      * @param toVideoId
      * @return
      */
-    int findCountByVdoId(Integer toVideoId);
+    int findCountByVdoId(int toVideoId);
 
     /**
      * 根据UserId查询该视频的评论者的评论数
@@ -44,7 +44,7 @@ public interface CommentatorService {
      * @param toVideoId,toUserId
      * @return
      */
-    int findCountByAndVidUid(Integer toVideoId, Integer toTxtId);
+    int findCountByAndVidUid(int toVideoId, int toTxtId);
 
 
     /**
@@ -86,7 +86,7 @@ public interface CommentatorService {
      * @param txtId
      * @return
      */
-    boolean delCommentator(Integer txtId);
+    boolean delCommentator(int txtId);
 
 
     /**
@@ -96,7 +96,7 @@ public interface CommentatorService {
      * @param token
      * @return 是否成功
      */
-    boolean modifyCommentTop(Integer txtId, String token);
+    boolean modifyCommentTop(int txtId, String token);
 
     /**
      * 评论踩一下
@@ -105,7 +105,7 @@ public interface CommentatorService {
      * @param token
      * @return 是否成功
      */
-    boolean modifyCommentTrample(Integer txtId, String token);
+    boolean modifyCommentTrample(int txtId, String token);
 
     /**
      * 根据视频id获取该视频的所有评论
@@ -113,5 +113,5 @@ public interface CommentatorService {
      * @param toVideoId
      * @return
      */
-    List<CommentList> findAllCommByVdoId(Integer toVideoId);
+    List<CommentList> findAllCommByVdoId(int toVideoId);
 }

@@ -93,4 +93,11 @@ public interface CommentatorDao {
      * @return
      */
     int deleteCommentator(Integer txtId);
+
+    /**
+     * 删除评论视频根据视频id
+     * @param toVideoId
+     * @return
+     */
+    int deleteCommentatorByVid(Integer toVideoId);
 }

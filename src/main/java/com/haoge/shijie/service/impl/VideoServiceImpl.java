@@ -1,6 +1,8 @@
 package com.haoge.shijie.service.impl;
 
 import com.haoge.shijie.constant.Constants;
+import com.haoge.shijie.dao.CollectionDao;
+import com.haoge.shijie.dao.CommentatorDao;
 import com.haoge.shijie.dao.VideoDao;
 import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
@@ -43,6 +45,10 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     private VideoDao videoDao;
     @Autowired
+    private CommentatorDao commentatorDao;
+    @Autowired
+    private CollectionDao collectionDao;
+    @Autowired
     private UserService userService;
     @Autowired
     private FileService fileService;
@@ -62,7 +68,7 @@ public class VideoServiceImpl implements VideoService {
             @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
     })
     public boolean modifyVideo(HttpServletRequest request) {
-        Integer videoId = Integer.valueOf(request.getParameter("videoId"));
+        int videoId = Integer.valueOf(request.getParameter("videoId"));
         String title = request.getParameter("title");
         String content = request.getParameter("content");
         String type = request.getParameter("type");
@@ -173,7 +179,7 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Cacheable
-    public VideoBean findVideoByVid(Integer videoId) {
+    public VideoBean findVideoByVid(int videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             VideoBean videoBean = videoDao.queryVideoByVid(videoId);
             if (videoBean == null) {
@@ -199,14 +205,17 @@ public class VideoServiceImpl implements VideoService {
             @CacheEvict(value = "videoCache", allEntries = true),
             @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
     })
-    public boolean delVideoByVid(String token, Integer videoId) {
+    public boolean delVideoByVid(String token, int videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             UserBean userBean = userService.findUserByToken(token);
             VideoBean videoBean = findVideoByVid(videoId);
             if (videoBean.getUserId() == userBean.getUserId()) {
                 try {
+                     commentatorDao.deleteCommentatorByVid(videoId);
+                     collectionDao.deleteUserCollectionByVid(videoId);
                     int res = videoDao.deleteVideo(videoId);
-                    if (res > 0) {
+
+                    if (res > 0 ) {
                         return true;
                     } else {
                         return false;
@@ -233,7 +242,8 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional
-    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true)})
+    @Caching(evict = {
+    @CacheEvict(value = "userAndVideo", allEntries = true),})
     public boolean addVideo(VideoBean video, String token, MultipartFile[] file, String filePath) {
         String[] fileType = null;
         String[] filesPath = new String[]{filePath + VIDEOPATH.getName(), filePath + VIDEOCOVERPATH.getName()};
@@ -260,7 +270,7 @@ public class VideoServiceImpl implements VideoService {
             throw new RuntimeException("参数不合法");
         }
         UserBean user = userService.findUserByToken(token);
-        Integer videoId = videoDao.queryVideoLastId();
+        int videoId = videoDao.queryVideoLastId();
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             //根据videoType获取文件后缀名
             String videoext = FileUtil.fileTypeConvert(fileType[0]);
@@ -321,7 +331,7 @@ public class VideoServiceImpl implements VideoService {
             @CacheEvict(value = "videoCache", allEntries = true),
             @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
     })
-    public boolean modifyVideoPlayCount(Integer VideoId, String token) {
+    public boolean modifyVideoPlayCount(int VideoId, String token) {
         if (StrJudgeUtil.isCorrectInt(VideoId)) {
             try {
                 int res = videoDao.updatePlayCountAdd(VideoId);
@@ -348,7 +358,8 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Cacheable(value = "userAndVideo")
-    public Paging searchVideos(Integer pageIndex, Integer pageSize, String content) {
+    public Paging searchVideos(int pageIndex, int pageSize, String content) {
+
         if (StrJudgeUtil.isCorrectInt(pageIndex) &&
                 StrJudgeUtil.isCorrectInt(pageSize) &&
                 StrJudgeUtil.isCorrectStr(content)) {
@@ -380,7 +391,7 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Cacheable(value = "userAndVideo")
-    public Paging showByType(Integer pageIndex, Integer pageSize, String videoType) {
+    public Paging showByType(int pageIndex, int pageSize, String videoType) {
         if (StrJudgeUtil.isCorrectInt(pageIndex) &&
                 StrJudgeUtil.isCorrectInt(pageSize) &&
                 StrJudgeUtil.isCorrectStr(videoType)) {
@@ -422,7 +433,7 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Cacheable(value = "videoCache")
-    public AppHomePageBean showHomePage(Integer eachTypeNum) {
+    public AppHomePageBean showHomePage(int eachTypeNum) {
         if (!StrJudgeUtil.isCorrectInt(eachTypeNum) || eachTypeNum == 0) {
             throw new RuntimeException("参数不合法");
         }
@@ -446,6 +457,32 @@ public class VideoServiceImpl implements VideoService {
     }
 
     /**
+     * 分页获取首页数据
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    @Override
+    @Cacheable(value = "videoCache")
+    public ArrayList HomePageData(int pageIndex, int pageSize) {
+        if (!(StrJudgeUtil.isCorrectInt(pageIndex) || pageIndex == 0)||
+                !(StrJudgeUtil.isCorrectInt(pageSize) || pageSize == 0)) {
+            throw new RuntimeException("参数不合法");
+        }
+        ArrayList videoList=new ArrayList();
+        try{
+       List<VideoBean> caeateTimes =  videoDao.queryVideosByIndexDESC("video_creat_time",pageIndex,pageSize);
+       List<VideoBean> playerCounts =  videoDao.queryVideosByIndexDESC("player_count",pageIndex,pageSize);
+       List<VideoBean> videoTopNums =  videoDao.queryVideosByIndexDESC("video_tip_num",pageIndex,pageSize);
+       videoList.add(caeateTimes);
+       videoList.add(playerCounts);
+       videoList.add(videoTopNums);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+        return videoList;
+    }
+    /**
      * 视频顶一下
      *
      * @param VideoId
@@ -458,7 +495,7 @@ public class VideoServiceImpl implements VideoService {
             @CacheEvict(value = "videoCache", allEntries = true),
             @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
     })
-    public boolean modifyVideoTop(Integer VideoId, String token) {
+    public boolean modifyVideoTop(int VideoId, String token) {
         if (StrJudgeUtil.isCorrectInt(VideoId)) {
             try {
                 int res = videoDao.updateVdoTopAdd(VideoId);
@@ -488,7 +525,7 @@ public class VideoServiceImpl implements VideoService {
             @CacheEvict(value = "videoCache", allEntries = true),
             @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
     })
-    public boolean modifyVideoTrample(Integer VideoId, String token) {
+    public boolean modifyVideoTrample(int VideoId, String token) {
         if (StrJudgeUtil.isCorrectInt(VideoId)) {
             try {
                 int res = videoDao.updateVdeoTraAdd(VideoId);

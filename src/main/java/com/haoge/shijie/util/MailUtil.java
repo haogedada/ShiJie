@@ -13,7 +13,8 @@ public class MailUtil implements Runnable {
     private String email;// 收件人邮箱
     private String code;// 激活码
     private String mailType;//邮件类型
-
+    private final String apiUrl ="http://www.haogedada.top/apiep";
+    private final String testUrl ="127.0.0.1:8080";
     public MailUtil(String email, String code, String mailType) {
         this.email = email;
         this.code = code;
@@ -59,8 +60,8 @@ public class MailUtil implements Runnable {
                             "<head></head><body>" +
                             "<div style= \"background:#DBF1ED\">" +
                             "<h2>感谢您注册视界！请点击以下链接进行验证，完成您的注册过程：\n" +
-                            "</h2><h3><a href='http://www.haogedada.top/api/register/activation?code=" + code + "'>" +
-                            "http://www.haogedada.top/api/register/activation?code=" + code + "</href>\n" +
+                            "</h2><h3><a href='"+apiUrl+"/register/activation?code=" + code + "'>" +apiUrl+
+                            "/register/activation?code=" + code + "</href>\n" +
                             "</h3><div style=\"font-size: 1.25em\">\n" +
                             "注：如果链接无法点击打开,请将上面链接复制粘贴到浏览器地址栏中访问。感谢对视界的支持！<br>\n" +
                             "敬请关注视界动态：本邮件由系统自动发送，请勿直接回复！<br>\n" +

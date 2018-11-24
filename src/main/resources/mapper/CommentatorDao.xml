@@ -115,4 +115,8 @@
         DELETE FROM Tb_commentator
          WHERE txt_id=#{txtId}
     </delete>
+    <delete id="deleteCommentatorByVid">
+        DELETE FROM Tb_commentator
+         WHERE to_video_id=#{toVideoId}
+    </delete>
 </mapper>

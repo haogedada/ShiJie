@@ -56,4 +56,11 @@ public interface CollectionDao {
      */
     int deleteUserCollection(@Param("userId") Integer userId, @Param("videoId") Integer videoId);
 
+    /**
+     *
+     * 根据视频id删除收藏
+     * @param videoId
+     * @return
+     */
+    int deleteUserCollectionByVid(@Param("videoId") Integer videoId);
 }

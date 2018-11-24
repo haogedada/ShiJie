@@ -1,20 +1,28 @@
 package com.haoge.shijie.controller;
 
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.haoge.shijie.annotation.SerializedField;
 import com.haoge.shijie.constant.Constants;
+import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.AppHomePageBean;
 import com.haoge.shijie.pojo.respModelBean.Paging;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.VideoService;
+import com.haoge.shijie.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 //游客控制器
@@ -27,8 +35,8 @@ public class TouristController {
     //搜索功能
     @GetMapping("/search/{pageIndex}&&{pageSize}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean search(@PathVariable("pageIndex") Integer pageIndex,
-                               @PathVariable("pageSize") Integer pageSize,
+    public ResponseBean search(@PathVariable("pageIndex") int pageIndex,
+                               @PathVariable("pageSize") int pageSize,
                                @RequestParam("search") String content) {
         Paging paging = videoService.searchVideos(pageIndex, pageSize, content);
         return new ResponseBean().successMethod(paging);
@@ -37,8 +45,8 @@ public class TouristController {
     //按视频分类显示
     @GetMapping("/videoType/{pageIndex}&&{pageSize}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean videoByType(@PathVariable("pageIndex") Integer pageIndex,
-                                    @PathVariable("pageSize") Integer pageSize,
+    public ResponseBean videoByType(@PathVariable("pageIndex") int pageIndex,
+                                    @PathVariable("pageSize") int pageSize,
                                     @RequestParam("videoType") String videoType) {
         Paging paging = videoService.showByType(pageIndex, pageSize, videoType);
         return new ResponseBean().successMethod(paging);
@@ -52,9 +60,27 @@ public class TouristController {
      */
     @GetMapping("/app/homepage/{eachTypeNum}")
     @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
-    public ResponseBean getHomePage(@PathVariable("eachTypeNum") Integer eachTypeNum) {
+    public ResponseBean getHomePage(@PathVariable("eachTypeNum") int eachTypeNum) {
         AppHomePageBean appHomePageBean = videoService.showHomePage(eachTypeNum);
         return new ResponseBean().successMethod(appHomePageBean);
+    }
+
+    /**
+     * 视界首页分类数据
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/home/{pageIndex}&&{pageSize}")
+    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
+    public ResponseBean getHomePageData(@PathVariable("pageIndex") int pageIndex,
+                                 @PathVariable("pageSize") int pageSize) {
+           ArrayList videoList  = videoService.HomePageData(pageIndex,pageSize);
+              if(videoList.size()>0){
+                  return new ResponseBean().successMethod(videoList);
+              }else {
+                  throw new RuntimeException("数据异常");
+              }
     }
 
     //获取所有视频分类
@@ -71,5 +97,26 @@ public class TouristController {
         } else {
             return new ResponseBean().failMethod(500, "获取视频分类列表失败");
         }
+    }
+
+    /**
+     * 获取软件版本信息
+     * @param request
+     * @return
+     */
+    @GetMapping("/AppVersions")
+    @SerializedField(includes = {"code", "msg", "data"}, encryptions = {"data"})
+    public ResponseBean getAppVersions( HttpServletRequest request) {
+        String versionsPath =  request.getServletContext().getRealPath("AppVersions.json");
+        String json="";
+        try{
+            json = FileUtil.readToString(versionsPath);
+        }catch (Exception e){
+            throw new RuntimeException("可能json文件不存在"+e.getMessage());
+        }
+        Map m = new Gson().fromJson(json,Map.class);
+        String appVersions = (String) m.get("appVersions");
+        String updateMsg = (String) m.get("updateMsg");
+        return new ResponseBean().successMethod(m);
     }
 }

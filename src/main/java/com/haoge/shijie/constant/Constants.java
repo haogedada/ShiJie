@@ -1,5 +1,6 @@
 package com.haoge.shijie.constant;
 
+
 /**
  * 常量类
  */
@@ -53,6 +54,7 @@ public class Constants {
         }
     }
 
+
     /**
      * url类型
      * 1.视频url
@@ -60,9 +62,10 @@ public class Constants {
      * 3.头像图片url
      */
     public enum urlType {
-        VIDEOURL(1, "http://www.haogedada.top/api/upLoadFile/videoFile/"),
-        VIDEOCOVERURL(2, "http://www.haogedada.top/api/upLoadFile/videoCover/"),
-        HEADURL(3, "http://www.haogedada.top/api/upLoadFile/headImage/");
+        VIDEOURL(1, "http://www.haogedada.top/apiep/upLoadFile/videoFile/"),
+        VIDEOCOVERURL(2, "http://www.haogedada.top/apiep/upLoadFile/videoCover/"),
+        HEADURL(3, "http://www.haogedada.top/apiep/upLoadFile/headImage/");
+
         private final Integer value;
         private final String name;
 

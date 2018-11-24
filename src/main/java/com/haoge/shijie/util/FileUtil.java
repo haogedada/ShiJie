@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.concurrent.Future;
 
 import static com.haoge.shijie.constant.Constants.prefixType.HEADIMGPREFIX;
@@ -110,10 +109,12 @@ public class FileUtil {
     public static boolean deleteFile(String filePath) {
         File file = new File(filePath);
         if (file.exists()) {
-            file.delete();
+           file.delete();
+           return true;
+        }else {
             return true;
         }
-        return false;
+
     }
 
     /**
@@ -244,6 +245,29 @@ public class FileUtil {
             return true;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public static String readToString(String fileName) {
+        String encoding = "UTF-8";
+        File file = new File(fileName);
+        Long filelength = file.length();
+        byte[] filecontent = new byte[filelength.intValue()];
+        try {
+            FileInputStream in = new FileInputStream(file);
+            in.read(filecontent);
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            return new String(filecontent, encoding);
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("The OS does not support " + encoding);
+            e.printStackTrace();
+            return null;
         }
     }
 

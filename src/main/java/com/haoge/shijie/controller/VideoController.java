@@ -5,6 +5,7 @@ import com.haoge.shijie.annotation.SerializedField;
 import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.VideoService;
+import com.haoge.shijie.util.StrJudgeUtil;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,7 @@ public class VideoController {
     //获取视频
     @GetMapping("/user/video/{videoId}")
     @SerializedField(includes = {"code", "msg", "data"})
-    public ResponseBean getVideo(@PathVariable("videoId") Integer videoId) {
+    public ResponseBean getVideo(@PathVariable("videoId") int videoId) {
         VideoBean videoBean = videoService.findVideoByVid(videoId);
         return new ResponseBean().successMethod(videoBean);
     }
@@ -56,7 +57,7 @@ public class VideoController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean delVideo(@RequestHeader("Authorization") String token,
-                                 @PathVariable("videoId") Integer videoId
+                                 @PathVariable("videoId") int videoId
     ) {
         boolean success = videoService.delVideoByVid(token, videoId);
         if (success) {
@@ -71,7 +72,7 @@ public class VideoController {
     @RequiresAuthentication
     @SerializedField(includes = {"code", "msg", "data"})
     public ResponseBean modifyVideo(@RequestHeader("Authorization") String token,
-                                    @RequestParam("videoId") Integer videoId,
+                                    @RequestParam("videoId") int videoId,
                                     @RequestParam("title") String videoTitle,
                                     @RequestParam("content") String videoContent,
                                     @RequestParam("type") String videoType,

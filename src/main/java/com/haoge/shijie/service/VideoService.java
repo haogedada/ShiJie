@@ -6,6 +6,7 @@ import com.haoge.shijie.pojo.respModelBean.Paging;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 public interface VideoService {
 
@@ -24,7 +25,7 @@ public interface VideoService {
      * @param videoId
      * @return
      */
-    boolean delVideoByVid(String token, Integer videoId);
+    boolean delVideoByVid(String token, int videoId);
 
     /**
      * 修改视频及修改封面
@@ -51,7 +52,7 @@ public interface VideoService {
      * @param videoId
      * @return
      */
-    VideoBean findVideoByVid(Integer videoId);
+    VideoBean findVideoByVid(int videoId);
 
     /**
      * 视频顶一下
@@ -60,7 +61,7 @@ public interface VideoService {
      * @param token
      * @return 是否成功
      */
-    boolean modifyVideoTop(Integer toVideoId, String token);
+    boolean modifyVideoTop(int toVideoId, String token);
 
     /**
      * 视频踩一下
@@ -69,7 +70,7 @@ public interface VideoService {
      * @param token
      * @return 是否成功
      */
-    boolean modifyVideoTrample(Integer VideoId, String token);
+    boolean modifyVideoTrample(int VideoId, String token);
 
     /**
      * 视频播放量+1
@@ -78,7 +79,7 @@ public interface VideoService {
      * @param token
      * @return 是否成功
      */
-    boolean modifyVideoPlayCount(Integer VideoId, String token);
+    boolean modifyVideoPlayCount(int VideoId, String token);
 
     /**
      * 搜索视频
@@ -88,7 +89,7 @@ public interface VideoService {
      * @param content
      * @return
      */
-    Paging searchVideos(Integer pageIndex, Integer pageSize, String content);
+    Paging searchVideos(int pageIndex, int pageSize, String content);
 
     /**
      * 按视频分类显示
@@ -98,7 +99,7 @@ public interface VideoService {
      * @param videoType
      * @return
      */
-    Paging showByType(Integer pageIndex, Integer pageSize, String videoType);
+    Paging showByType(int pageIndex, int pageSize, String videoType);
 
     /**
      * 视频首页
@@ -106,5 +107,15 @@ public interface VideoService {
      * @param eachTypeNum
      * @return
      */
-    AppHomePageBean showHomePage(Integer eachTypeNum);
+    AppHomePageBean showHomePage(int eachTypeNum);
+
+    /**
+     *视界首页数据
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    ArrayList HomePageData(int pageIndex, int pageSize);
+
+
 }

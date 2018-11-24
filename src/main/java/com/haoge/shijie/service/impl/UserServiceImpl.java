@@ -2,10 +2,7 @@ package com.haoge.shijie.service.impl;
 
 import com.haoge.shijie.constant.Constants;
 import com.haoge.shijie.dao.*;
-import com.haoge.shijie.pojo.AuxiliaryUserBean;
-import com.haoge.shijie.pojo.UserBean;
-import com.haoge.shijie.pojo.UserFriendsBean;
-import com.haoge.shijie.pojo.VideoBean;
+import com.haoge.shijie.pojo.*;
 import com.haoge.shijie.pojo.respModelBean.UserHomeBean;
 import com.haoge.shijie.service.FileService;
 import com.haoge.shijie.service.UserService;
@@ -68,7 +65,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Cacheable(value = "userCache")
-    public UserBean findUserById(Integer userId) {
+    public UserBean findUserById(int userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             UserBean userBean = userDao.queryUserById(userId);
             if (userBean == null || !StrJudgeUtil.isCorrectInt(userBean.getUserId())) {
@@ -89,7 +86,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Cacheable(value = "userCache")
-    public UserBean findUserAndAuxById(Integer userId) {
+    public UserBean findUserAndAuxById(int userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             UserBean userBean = userDao.queryUserAndAuxById(userId);
             if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName()) &&
@@ -236,11 +233,14 @@ public class UserServiceImpl implements UserService {
                 String ext = FileUtil.fileTypeConvert(fileType);
                 String userName = JWTUtil.getUsername(token);
                 UserBean userBean1 = userDao.queryUserByName(userName);
-                //删除原来的视频
-                boolean isDelete = fileService.deleteFile(filePath + HEADPATH.getName(), userBean1.getHeadimgUrl());
-                if (!isDelete) {
-                    throw new RuntimeException("操作失败");
-                }
+                //删除原来的文件
+               if(userBean1.getHeadimgUrl()!=null&&!userBean1.equals(" ")){
+                   try {
+                      fileService.deleteFile(filePath + HEADPATH.getName(), userBean1.getHeadimgUrl());
+                   }catch (Exception e){
+                       throw new RuntimeException(e.getMessage()+"删除文件出错");
+                   }
+               }
                 String fileName = HEADIMGPREFIX.getName() + userBean1.getUserId() + ext;
                 filesName = new String[]{fileName};
                 userBean1.setUserNickname(userBean.getUserNickname());
@@ -282,7 +282,7 @@ public class UserServiceImpl implements UserService {
             @CacheEvict(value = "userAndFriend", allEntries = true),
             @CacheEvict(value = "videoCache", allEntries = true)
     })
-    public boolean delUser(Integer userId) {
+    public boolean delUser(int userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             try {
                 int row = userDao.deleteUser(userId);
@@ -331,7 +331,7 @@ public class UserServiceImpl implements UserService {
     //其他用户主页
     @Override
     @Cacheable(value = "userAndVideo")
-    public UserHomeBean goUserHomeByUid(Integer userId) {
+    public UserHomeBean goUserHomeByUid(int userId) {
         UserHomeBean userHome = new UserHomeBean();
         if (!StrJudgeUtil.isCorrectInt(userId)) {
             throw new RuntimeException("参数不合法");
@@ -361,7 +361,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    @CacheEvict(value = "loginCache", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "userCache", allEntries = true),
+    })
     public boolean modifyPassword(String userName, String code, String password) {
         UserBean userBean = userDao.queryUserByName(userName);
         if (userBean != null) {
@@ -410,54 +412,144 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @CacheEvict(value = "userAndFriend", allEntries = true)
-    public boolean addFollow(String token, Integer friendId) {
-        UserBean userBean = this.findUserByToken(token);
+    public boolean addFollow(String token, int friendId) {
         if (StrJudgeUtil.isCorrectInt(friendId)) {
-            int count = userFriendsDao.queryFriendCount(userBean.getUserId(), friendId);
-            if (count > 0) {
-                throw new RuntimeException("你已经关注过该用户");
+            boolean isFollow = false;
+            UserBean userBean = this.findUserByToken(token);
+            List<UserBean> userBeans = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName());
+            if (userBean.getUserId() == friendId) {
+                throw new RuntimeException("你不能关注自己!");
             }
-            UserFriendsBean user = new UserFriendsBean();
-            user.setUserId(userBean.getUserId());
-            user.setFriendId(friendId);
-            user.setFriendType(Constants.friendType.FOLLOW.getName());
-            UserFriendsBean userFriend = new UserFriendsBean();
-            userFriend.setUserId(friendId);
-            userFriend.setFriendId(userBean.getUserId());
-            userFriend.setFriendType(Constants.friendType.FANS.getName());
-            try {
-                int res = userFriendsDao.insertUserFriend(user);
-                int res2 = userFriendsDao.insertUserFriend(userFriend);
-                if (res > 0 && res2 > 0) {
-                    return true;
-                } else {
-                    return false;
+            for (int i = 0; i < userBeans.size(); i++) {
+                if (friendId == userBeans.get(i).getUserId()) {
+                    isFollow = true;
+                    throw new RuntimeException("你已经关注过该好友了");
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
+            }
+            if (!isFollow) {
+                UserFriendsBean user = new UserFriendsBean();
+                user.setUserId(userBean.getUserId());
+                user.setFriendId(friendId);
+                user.setFriendType(Constants.friendType.FOLLOW.getName());
+                UserFriendsBean userFriend = new UserFriendsBean();
+                userFriend.setUserId(friendId);
+                userFriend.setFriendId(userBean.getUserId());
+                userFriend.setFriendType(Constants.friendType.FANS.getName());
+                try {
+                    int res = userFriendsDao.insertUserFriend(user);
+                    int res2 = userFriendsDao.insertUserFriend(userFriend);
+                    if (res > 0 && res2 > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
             }
         } else {
             throw new RuntimeException("参数不合法");
         }
+        return false;
     }
 
+    /**
+     * 取消关注
+     *
+     * @param token
+     * @param friendId
+     * @return
+     */
     @Override
     @Transactional
-    @CacheEvict(value = "userAndFriend", allEntries = true)
-    public boolean delFollow(String token, Integer friendId) {
+    public boolean cancelFollow(String token, int friendId) {
         if (StrJudgeUtil.isCorrectInt(friendId)) {
             UserBean userBean = this.findUserByToken(token);
-            try {
-                int res = userFriendsDao.deleteUserFriend(userBean.getUserId(), friendId);
-                if (res > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
+            if (userBean.getUserId() == friendId) {
+                throw new RuntimeException("操作异常");
             }
+            List<UserBean> userBeans = userFriendsDao.queryFriendByIdAndType(userBean.getUserId(), Constants.friendType.FOLLOW.getName());
+            for (int i = 0; i < userBeans.size(); i++) {
+                if (friendId == userBeans.get(i).getUserId()) {
+                    int res = userFriendsDao.deleteUserFriend(userBeans.get(i).getUserId(), friendId);
+                    if (res > 0) {
+                        return true;
+                    } else {
+                        throw new RuntimeException("你还没有关注他");
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
         }
         return false;
     }
+
+    @Override
+    public boolean collectUserVideo(String token, int videoId) {
+        if (StrJudgeUtil.isCorrectInt(videoId)) {
+            UserBean userBean = this.findUserByToken(token);
+            List<VideoBean> videoBeans = collectionDao.queryCollectionByUid(userBean.getUserId());
+            boolean isCanCollect = true;
+            for (int i = 0; i < videoBeans.size(); i++) {
+                if (videoBeans.get(i).getVideoId() == videoId) {
+                    isCanCollect = false;
+                    throw new RuntimeException("你已经收藏过该作品");
+                }
+                if (videoBeans.get(i).getUserBean().getUserId() == userBean.getUserId()) {
+                    isCanCollect = false;
+                    throw new RuntimeException("你不能收藏自己的作品");
+                }
+            }
+            if (isCanCollect) {
+                try {
+                    CollectionBean collectionBean = new CollectionBean();
+                    collectionBean.setUserBean(userBean);
+                    collectionBean.setVideoId(videoId);
+                    collectionBean.setUserId(userBean.getUserId());
+                    int res = collectionDao.insertCollection(collectionBean);
+                    if (res > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("异常" + e.getMessage());
+                }
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
+        }
+        return false;
+    }
+
+    @Override
+    public boolean cancelCollectUserVideo(String token, int videoId) {
+        if (StrJudgeUtil.isCorrectInt(videoId)) {
+            UserBean userBean = this.findUserByToken(token);
+            List<VideoBean> videoBeans = collectionDao.queryCollectionByUid(userBean.getUserId());
+            for (int i = 0; i < videoBeans.size(); i++) {
+                if (videoBeans.get(i).getVideoId() == videoId) {
+                    try {
+                        int res = collectionDao.deleteUserCollection(userBean.getUserId(), videoBeans.get(i).getVideoId());
+                        if (res > 0) {
+                            return true;
+                        } else {
+                            throw new RuntimeException("你还没有收藏该作品");
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("异常" + e.getMessage());
+                    }
+                }
+                if (videoBeans.get(i).getUserBean().getUserId() == userBean.getUserId()) {
+                    throw new RuntimeException("出错了");
+                }
+            }
+        } else {
+            throw new RuntimeException("参数不合法");
+        }
+        return false;
+    }
+
+
 }

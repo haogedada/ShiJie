@@ -19,7 +19,7 @@ public interface AuxiliaryUserService {
      * @param userId
      * @return
      */
-    AuxiliaryUserBean findAuxiliaryUserById(Integer userId);
+    AuxiliaryUserBean findAuxiliaryUserById(int userId);
 
     /**
      * 根据userCode查询区域
@@ -51,7 +51,7 @@ public interface AuxiliaryUserService {
      * @param userId
      * @return
      */
-    boolean delAuxiliaryUser(Integer userId);
+    boolean delAuxiliaryUser(int userId);
 
     /**
      * 激活用户

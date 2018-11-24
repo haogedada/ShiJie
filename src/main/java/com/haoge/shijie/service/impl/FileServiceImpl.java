@@ -64,7 +64,12 @@ public class FileServiceImpl implements FileService {
     public boolean deleteFile(String filePath, String fileUrl) {
         //获取文件名字
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-        boolean isDelete = FileUtil.deleteFile(filePath + fileName);
+        boolean isDelete = false;
+        try {
+             isDelete = FileUtil.deleteFile(filePath + fileName);
+        }catch (Exception e){
+
+        }
         if (isDelete) {
             return true;
         }

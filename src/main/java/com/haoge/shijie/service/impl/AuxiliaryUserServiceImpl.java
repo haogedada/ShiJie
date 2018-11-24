@@ -30,8 +30,7 @@ public class AuxiliaryUserServiceImpl implements AuxiliaryUserService {
     }
 
     @Override
-    @Cacheable(value = "loginCache")
-    public AuxiliaryUserBean findAuxiliaryUserById(Integer userId) {
+    public AuxiliaryUserBean findAuxiliaryUserById(int userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             AuxiliaryUserBean bean = auxiliaryUserDao.queryAuxiliaryUserById(userId);
             if (bean == null) {
@@ -98,7 +97,7 @@ public class AuxiliaryUserServiceImpl implements AuxiliaryUserService {
 
     @Override
     @Transactional
-    public boolean delAuxiliaryUser(Integer userId) {
+    public boolean delAuxiliaryUser(int userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             try {
                 int res = auxiliaryUserDao.deleteAuxiliaryUser(userId);
