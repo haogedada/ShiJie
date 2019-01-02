@@ -46,7 +46,6 @@ public class LoginServiceImpl implements LoginService {
                     throw new RuntimeException("用户不存在");
                 }
             } catch (Exception e) {
-
                 throw new RuntimeException(e.getMessage());
             }
         } else {

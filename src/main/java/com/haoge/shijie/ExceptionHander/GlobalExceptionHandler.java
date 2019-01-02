@@ -70,13 +70,12 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public @ResponseBody
-    ResponseBean handleHttpRequestMethodNotSupportedException(
+    @ResponseBody
+    public ResponseBean handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException e) {
         // log.error("request_method_not_supported...", e);
         //  return new response().failure("不支持请求方法或请求方法错误");
         return new ResponseBean(405, "request method not supported", null);
-
     }
 
     /**
