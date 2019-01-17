@@ -7,12 +7,14 @@ import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.CommentatorService;
 import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.service.VideoService;
+import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Api(tags = "视频交互控制器")
 @RestController
 //@RequestMapping("/comment")
 public class InteractionController {

@@ -6,12 +6,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.haoge.shijie.annotation.SerializedField;
 import com.haoge.shijie.constant.Constants;
+import com.haoge.shijie.dto.UserDTO;
+import com.haoge.shijie.pojo.UserBean;
 import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.AppHomePageBean;
 import com.haoge.shijie.pojo.respModelBean.Paging;
 import com.haoge.shijie.pojo.response.ResponseBean;
+import com.haoge.shijie.service.UserService;
 import com.haoge.shijie.service.VideoService;
 import com.haoge.shijie.util.FileUtil;
+import com.haoge.shijie.util.ModelMapperUtil;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,11 +31,14 @@ import java.util.Map;
 
 
 //游客控制器
+@Api(tags = "游客控制器")
 @RestController
 public class TouristController {
 
     @Autowired
     private VideoService videoService;
+    @Autowired
+    private UserService userService;
 
     //搜索功能
     @GetMapping("/search/{pageIndex}&&{pageSize}")
@@ -118,5 +126,13 @@ public class TouristController {
         String appVersions = (String) m.get("appVersions");
         String updateMsg = (String) m.get("updateMsg");
         return new ResponseBean().successMethod(m);
+    }
+
+    @GetMapping("/test")
+    @SerializedField(includes = {"code", "msg", "data"})
+    public ResponseBean test(){
+       UserBean userBean = userService.findUserById(1);
+       UserDTO userDTO = ModelMapperUtil.getStrictModelMapper().map(userBean,UserDTO.class);
+      return new ResponseBean().successMethod(userDTO);
     }
 }

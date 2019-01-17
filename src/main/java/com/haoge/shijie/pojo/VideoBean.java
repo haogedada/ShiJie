@@ -3,6 +3,9 @@ package com.haoge.shijie.pojo;
 
 import java.sql.Timestamp;
 
+/**
+ * @author haoge
+ */
 public class VideoBean {
     private String videoTitle, videoContent, videoUrl, videoCoverUrl, videoTime, videoType;
     private Integer videoId, userId, playerCount, videoTipNum, videoTrampleNum;

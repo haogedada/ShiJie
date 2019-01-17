@@ -7,6 +7,7 @@ import com.haoge.shijie.pojo.VideoBean;
 import com.haoge.shijie.pojo.respModelBean.UserHomeBean;
 import com.haoge.shijie.pojo.response.ResponseBean;
 import com.haoge.shijie.service.UserService;
+import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@Api(tags = "用户控制器")
 @RestController
 public class UserController {
     private final static String UPLOADPATH = "/upLoadFile/";

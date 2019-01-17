@@ -27,7 +27,6 @@ import java.util.Map;
  * @SerializedField(excludes={"success","message","data"})去除key不显示，并加密value,同时显示value的明文和加密
  */
 @Order(1)
-//@SuppressWarnings("unchecked")
 @ControllerAdvice(basePackages = "com.haoge.shijie.controller")//这句注释或包引错位置可以关闭加密
 public class MyResponseBodyAdvice implements ResponseBodyAdvice {
     //包含项

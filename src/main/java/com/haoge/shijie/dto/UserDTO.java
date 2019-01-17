@@ -1,33 +1,28 @@
-package com.haoge.shijie.pojo;
+package com.haoge.shijie.dto;
 
-import java.sql.Timestamp;
+import com.haoge.shijie.pojo.AuxiliaryUserBean;
 
-/**
- * @author haoge
- */
-public class UserBean {
+
+public class UserDTO {
     private Integer userId;
-    private String userName, userPassword, userNickname, userSex, userBirthday,
+    private String userName, userNickname, userSex, userBirthday,
             bardianSign, headimgUrl, userEmail;
-    private Timestamp registerTime;
     private AuxiliaryUserBean auxiliaryUserBean;
 
 
-    public UserBean() {
+    public UserDTO() {
     }
 
-    public UserBean(String userName, String userPassword, String userNickname,
+    public UserDTO(String userName, String userNickname,
                     String userSex, String userBirthdy, String bardianSign, String headimgUrl,
-                    Timestamp registerTime, String userEmail) {
+                    String userEmail) {
 
         this.userName = userName;
-        this.userPassword = userPassword;
         this.userNickname = userNickname;
         this.userSex = userSex;
         this.userBirthday = userBirthdy;
         this.bardianSign = bardianSign;
         this.headimgUrl = headimgUrl;
-        this.registerTime = registerTime;
         this.userEmail = userEmail;
     }
 
@@ -45,14 +40,6 @@ public class UserBean {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
     }
 
     public String getUserNickname() {
@@ -95,14 +82,6 @@ public class UserBean {
         this.headimgUrl = headimgUrl;
     }
 
-    public Timestamp getRegisterTime() {
-        return registerTime;
-    }
-
-    public void setRegisterTime(Timestamp registerTime) {
-        this.registerTime = registerTime;
-    }
-
     public String getUserEmail() {
         return userEmail;
     }
@@ -119,20 +98,5 @@ public class UserBean {
         this.auxiliaryUserBean = auxiliaryUserBean;
     }
 
-    @Override
-    public String toString() {
-        return "UserBean{" +
-                "userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", userPassword='" + userPassword + '\'' +
-                ", userNickname='" + userNickname + '\'' +
-                ", userSex='" + userSex + '\'' +
-                ", userBirthday='" + userBirthday + '\'' +
-                ", bardianSign='" + bardianSign + '\'' +
-                ", headimgUrl='" + headimgUrl + '\'' +
-                ", userEmail='" + userEmail + '\'' +
-                ", registerTime=" + registerTime +
-                ", auxiliaryUserBean=" + auxiliaryUserBean +
-                '}';
-    }
+
 }
