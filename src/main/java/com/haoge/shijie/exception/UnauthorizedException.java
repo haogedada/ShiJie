@@ -1,4 +1,4 @@
-package com.haoge.shijie.ExceptionHander;
+package com.haoge.shijie.exception;
 
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException(String msg) {

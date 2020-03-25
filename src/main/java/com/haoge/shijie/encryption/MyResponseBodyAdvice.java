@@ -1,4 +1,4 @@
-package com.haoge.shijie.EncryptionAndDecryptionProcessing;
+package com.haoge.shijie.encryption;
 
 
 import com.google.gson.Gson;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @SerializedField(excludes={"success","message","data"})去除key不显示，并加密value,同时显示value的明文和加密
  */
 @Order(1)
-@ControllerAdvice(basePackages = "com.haoge.shijie.controller")//这句注释或包引错位置可以关闭加密
+@ControllerAdvice(basePackages = "com.haoge.shijie.controller")
 public class MyResponseBodyAdvice implements ResponseBodyAdvice {
     //包含项
     private String[] includes = {};

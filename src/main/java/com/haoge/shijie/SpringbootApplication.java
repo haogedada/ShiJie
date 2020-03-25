@@ -10,18 +10,12 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@ServletComponentScan
+@SpringBootApplication
 @EnableAsync//开启异步调用方法
 @EnableCaching//开启缓存
-public class SpringbootApplication extends SpringBootServletInitializer {
+public class SpringbootApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SpringbootApplication.class, args);
-    }
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SpringbootApplication.class);
     }
 }

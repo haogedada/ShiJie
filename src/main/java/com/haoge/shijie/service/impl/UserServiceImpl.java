@@ -89,8 +89,10 @@ public class UserServiceImpl implements UserService {
     public UserBean findUserAndAuxById(int userId) {
         if (StrJudgeUtil.isCorrectInt(userId)) {
             UserBean userBean = userDao.queryUserAndAuxById(userId);
-            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName()) &&
-                    userBean.getAuxiliaryUserBean() != null) {
+            if (userBean != null && StrJudgeUtil.isCorrectStr(userBean.getUserName())) {
+                if (userBean.getAuxiliaryUserBean() == null) {
+                    throw new RuntimeException("用户未激活");
+                }
                 return userBean;
             } else {
                 throw new RuntimeException("findUserAndAuxById错误");
@@ -234,13 +236,13 @@ public class UserServiceImpl implements UserService {
                 String userName = JWTUtil.getUsername(token);
                 UserBean userBean1 = userDao.queryUserByName(userName);
                 //删除原来的文件
-               if(userBean1.getHeadimgUrl()!=null&&!userBean1.equals(" ")){
-                   try {
-                      fileService.deleteFile(filePath + HEADPATH.getName(), userBean1.getHeadimgUrl());
-                   }catch (Exception e){
-                       throw new RuntimeException(e.getMessage()+"删除文件出错");
-                   }
-               }
+                if (userBean1.getHeadimgUrl() != null && !userBean1.equals(" ")) {
+                    try {
+                        fileService.deleteFile(filePath + HEADPATH.getName(), userBean1.getHeadimgUrl());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage() + "删除文件出错");
+                    }
+                }
                 String fileName = HEADIMGPREFIX.getName() + userBean1.getUserId() + ext;
                 filesName = new String[]{fileName};
                 userBean1.setUserNickname(userBean.getUserNickname());

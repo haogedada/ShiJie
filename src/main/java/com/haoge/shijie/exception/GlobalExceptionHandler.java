@@ -1,4 +1,4 @@
-package com.haoge.shijie.ExceptionHander;
+package com.haoge.shijie.exception;
 
 
 import com.haoge.shijie.pojo.response.ResponseBean;

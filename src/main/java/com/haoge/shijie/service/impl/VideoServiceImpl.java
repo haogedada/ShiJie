@@ -200,22 +200,18 @@ public class VideoServiceImpl implements VideoService {
      * @return
      */
     @Override
-    @Transactional
-    @Caching(evict = {@CacheEvict(value = "userAndVideo", allEntries = true),
-            @CacheEvict(value = "videoCache", allEntries = true),
-            @CacheEvict(value = "collAndVideoAndUser", allEntries = true)
-    })
+    @Transactional(rollbackFor = Exception.class)
     public boolean delVideoByVid(String token, int videoId) {
         if (StrJudgeUtil.isCorrectInt(videoId)) {
             UserBean userBean = userService.findUserByToken(token);
             VideoBean videoBean = findVideoByVid(videoId);
-            if (videoBean.getUserId() == userBean.getUserId()) {
+            if (videoBean.getUserId().equals(userBean.getUserId())) {
                 try {
-                     commentatorDao.deleteCommentatorByVid(videoId);
-                     collectionDao.deleteUserCollectionByVid(videoId);
+                    commentatorDao.deleteCommentatorByVid(videoId);
+                    collectionDao.deleteUserCollection(userBean.getUserId(), videoId);
                     int res = videoDao.deleteVideo(videoId);
 
-                    if (res > 0 ) {
+                    if (res > 0) {
                         return true;
                     } else {
                         return false;
@@ -243,7 +239,7 @@ public class VideoServiceImpl implements VideoService {
     @Override
     @Transactional
     @Caching(evict = {
-    @CacheEvict(value = "userAndVideo", allEntries = true),})
+            @CacheEvict(value = "userAndVideo", allEntries = true),})
     public boolean addVideo(VideoBean video, String token, MultipartFile[] file, String filePath) {
         String[] fileType = null;
         String[] filesPath = new String[]{filePath + VIDEOPATH.getName(), filePath + VIDEOCOVERPATH.getName()};
@@ -458,6 +454,7 @@ public class VideoServiceImpl implements VideoService {
 
     /**
      * 分页获取首页数据
+     *
      * @param pageIndex
      * @param pageSize
      * @return
@@ -465,23 +462,24 @@ public class VideoServiceImpl implements VideoService {
     @Override
     @Cacheable(value = "videoCache")
     public ArrayList HomePageData(int pageIndex, int pageSize) {
-        if (!(StrJudgeUtil.isCorrectInt(pageIndex) || pageIndex == 0)||
+        if (!(StrJudgeUtil.isCorrectInt(pageIndex) || pageIndex == 0) ||
                 !(StrJudgeUtil.isCorrectInt(pageSize) || pageSize == 0)) {
             throw new RuntimeException("参数不合法");
         }
-        ArrayList videoList=new ArrayList();
-        try{
-       List<VideoBean> caeateTimes =  videoDao.queryVideosByIndexDESC("video_creat_time",pageIndex,pageSize);
-       List<VideoBean> playerCounts =  videoDao.queryVideosByIndexDESC("player_count",pageIndex,pageSize);
-       List<VideoBean> videoTopNums =  videoDao.queryVideosByIndexDESC("video_tip_num",pageIndex,pageSize);
-       videoList.add(caeateTimes);
-       videoList.add(playerCounts);
-       videoList.add(videoTopNums);
-        }catch (Exception e){
+        ArrayList videoList = new ArrayList();
+        try {
+            List<VideoBean> caeateTimes = videoDao.queryVideosByIndexDESC("video_creat_time", pageIndex, pageSize);
+            List<VideoBean> playerCounts = videoDao.queryVideosByIndexDESC("player_count", pageIndex, pageSize);
+            List<VideoBean> videoTopNums = videoDao.queryVideosByIndexDESC("video_tip_num", pageIndex, pageSize);
+            videoList.add(caeateTimes);
+            videoList.add(playerCounts);
+            videoList.add(videoTopNums);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return videoList;
     }
+
     /**
      * 视频顶一下
      *

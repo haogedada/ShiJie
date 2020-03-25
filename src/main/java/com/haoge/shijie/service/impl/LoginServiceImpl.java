@@ -9,6 +9,7 @@ import com.haoge.shijie.util.JWTUtil;
 import com.haoge.shijie.util.StrJudgeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -37,8 +38,7 @@ public class LoginServiceImpl implements LoginService {
     public ResponseBean getToken(String userName, String userPassword) {
         UserBean user = null;
         UserBean userBean = null;
-        if ((!userName.equals(" ") && userName != null) &&
-                (!userPassword.equals(" ") && userPassword != null)) {
+        if (!StringUtils.isEmpty(userName) &&StringUtils.isEmpty(userPassword)) {
             try {
                 userBean = loginDao.userLoginQueryByName(userName);
                 user = userService.findUserAndAuxById(userBean.getUserId());
